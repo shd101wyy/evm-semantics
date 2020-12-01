@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+<meta charset="utf-8" />
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1.0, maximum-scale=1.0"
+/>
+<meta
+  name="description"
+  content="K Semantics of the Ethereum Virtual Machine (EVM)"
+/>
+<meta name="keywords" content="runtime, verification, rv, k" />
+<meta name="author" content="EVM Semantics | Runtime Verification Inc" />
+<meta name="robots" content="index, follow" />
+
+<!--favicon icon-->
+<link rel="icon" type="image/png" href="../../../../assets/img/favicon.ico" />
+
+<title>KEVM: Semantics of EVM in K | evm-semantics</title>
+
+<!-- <base href="/k/" /> -->
+
+<!--web fonts-->
+<link
+  href="https://fonts.googleapis.com/css?family=Nunito:300,400,600,700,800"
+  rel="stylesheet"
+/>
+<link
+  href="https://fonts.googleapis.com/css?family=Lora:400i"
+  rel="stylesheet"
+/>
+
+<link
+  href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.14.0/css/all.min.css"
+  rel="stylesheet"
+/>
+
+<link href="../../../../assets/css/index.css" rel="stylesheet" />
+
+<!--[if (gt IE 9) |!(IE)]><!-->
+<!--<link rel="stylesheet" href="/assets/vendor/custom-nav/css/effects/fade-menu.css"/>-->
+<!-- <link rel="stylesheet" href="../../../../assets/k/vl-nav/css/effects/slide-menu.css" /> -->
+<!--<![endif]-->
+
+  </head>
+
+  <body>
+<header
+  class="navbar navbar-expand navbar-dark flex-column flex-md-row bd-navbar"
+>
+  <a class="logo-link" href="../../../../index.html"> EVM Semantics </a>
+  <ul class="navbar-nav ml-md-auto">
+    <li class="nav-item">
+      <a
+        class="nav-link pl-2 pr-1 mx-1 py-3 my-n2"
+        href="https://github.com/kframework/evm-semantics"
+        target="_blank"
+        rel="noopener"
+        aria-label="GitHub"
+      >
+        <i class="fab fa-github"></i>
+      </a>
+    </li>
+  </ul>
+  <!--
+  <a
+    class="btn btn-rv-blue d-none d-lg-inline-block mb-3 mb-md-0 ml-md-3"
+    href="../../../../downloads"
+    >Download</a
+  >
+  -->
+</header>
+
+
+    <div class="container-fluid">
+      <div class="row flex-xl-nowrap">
+<div class="col-12 col-md-3 col-xl-2 bd-sidebar mb-3">
+  <form
+    role="search"
+    class="bd-search d-flex align-items-center justify-content-between"
+  >
+    <input
+      type="search"
+      class="form-control"
+      placeholder="Search..."
+      aria-label="Search for..."
+      autocomplete="false"
+      id="search-box"
+    />
+    <button
+      class="btn bd-search-docs-toggle d-md-none p-0 ml-3 collapsed"
+      type="button"
+      aria-label="Toggle docs navigation"
+      style="font-size: 1.4rem"
+    >
+      <i class="fas fa-bars"></i>
+    </button>
+  </form>
+  <nav class="collapse bd-links" aria-label="Main navigation">
+    <div class="bd-toc-item">
+      <a class="bd-toc-link" href="../../../../">Homepage</a>
+      <a class="bd-toc-link" href="../../../../INSTALL">Install</a>
+    </div>
+  </nav>
+</div>
+
+        <main
+          class="col-12 col-md-9 col-xl-8 py-md-3 pl-md-5 bd-content"
+          role="main"
+        >
+          <div class="markdown-preview"><html><head></head><body><h1 id="libsecp256k1">libsecp256k1</h1>
+<p><a href="https://travis-ci.org/bitcoin-core/secp256k1" target="_blank" rel="noopener"><img src="https://travis-ci.org/bitcoin-core/secp256k1.svg?branch=master" alt="Build Status"></a></p>
+<p>Optimized C library for EC operations on curve secp256k1.</p>
+<p>This library is a work in progress and is being used to research best practices. Use at your own risk.</p>
+<p>Features:</p>
+<ul>
+<li>secp256k1 ECDSA signing/verification and key generation.</li>
+<li>Adding/multiplying private/public keys.</li>
+<li>Serialization/parsing of private keys, public keys, signatures.</li>
+<li>Constant time, constant memory access signing and pubkey generation.</li>
+<li>Derandomized DSA (via RFC6979 or with a caller provided function.)</li>
+<li>Very efficient implementation.</li>
+</ul>
+<h2 id="implementation-details">Implementation details</h2>
+<ul>
+<li>General
+<ul>
+<li>No runtime heap allocation.</li>
+<li>Extensive testing infrastructure.</li>
+<li>Structured to facilitate review and analysis.</li>
+<li>Intended to be portable to any system with a C89 compiler and uint64_t support.</li>
+<li>Expose only higher level interfaces to minimize the API surface and improve application security. (&quot;Be difficult to use insecurely.&quot;)</li>
+</ul>
+</li>
+<li>Field operations
+<ul>
+<li>Optimized implementation of arithmetic modulo the curve&apos;s field size (2^256 - 0x1000003D1).
+<ul>
+<li>Using 5 52-bit limbs (including hand-optimized assembly for x86_64, by Diederik Huys).</li>
+<li>Using 10 26-bit limbs.</li>
+</ul>
+</li>
+<li>Field inverses and square roots using a sliding window over blocks of 1s (by Peter Dettman).</li>
+</ul>
+</li>
+<li>Scalar operations
+<ul>
+<li>Optimized implementation without data-dependent branches of arithmetic modulo the curve&apos;s order.
+<ul>
+<li>Using 4 64-bit limbs (relying on __int128 support in the compiler).</li>
+<li>Using 8 32-bit limbs.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Group operations
+<ul>
+<li>Point addition formula specifically simplified for the curve equation (y^2 = x^3 + 7).</li>
+<li>Use addition between points in Jacobian and affine coordinates where possible.</li>
+<li>Use a unified addition/doubling formula where necessary to avoid data-dependent branches.</li>
+<li>Point/x comparison without a field inversion by comparison in the Jacobian coordinate space.</li>
+</ul>
+</li>
+<li>Point multiplication for verification (a<em>P + b</em>G).
+<ul>
+<li>Use wNAF notation for point multiplicands.</li>
+<li>Use a much larger window for multiples of G, using precomputed multiples.</li>
+<li>Use Shamir&apos;s trick to do the multiplication with the public key and the generator simultaneously.</li>
+<li>Optionally (off by default) use secp256k1&apos;s efficiently-computable endomorphism to split the P multiplicand into 2 half-sized ones.</li>
+</ul>
+</li>
+<li>Point multiplication for signing
+<ul>
+<li>Use a precomputed table of multiples of powers of 16 multiplied with the generator, so general multiplication becomes a series of additions.</li>
+<li>Access the table with branch-free conditional moves so memory access is uniform.</li>
+<li>No data-dependent branches</li>
+<li>The precomputed tables add and eventually subtract points for which no known scalar (private key) is known, preventing even an attacker with control over the private key used to control the data internally.</li>
+</ul>
+</li>
+</ul>
+<h2 id="build-steps">Build steps</h2>
+<p>libsecp256k1 is built using autotools:</p>
+<pre><code>$ ./autogen.sh
+$ ./configure
+$ make
+$ ./tests
+$ sudo make install  # optional
+</code></pre>
+</body></html></div>
+        </main>
+      </div>
+    </div>
+<footer class="app-footer text-md-left text-center">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-md-2 mb-md-0 mb-4">
+        <span class="pr-md-5 pr-0 py-3">
+          <a href="https://runtimeverification.com" target="_blank">
+            <picture>
+              <source
+                srcset="../../../../assets/img/rv-logo-dark.png"
+                media="(prefers-color-scheme: dark)"
+              />
+              <img
+                class="pr-3 footer-logo"
+                src="../../../../assets/img/rv-logo.png"
+                alt="Runtime Verification Inc logo"
+              />
+            </picture>
+          </a>
+        </span>
+      </div>
+      <div class="col-md-6 mb-md-0 mb-4"></div>
+      <div class="col-md-4 text-md-right">
+        <p class="copyright">
+          &copy; 2020 Runtime Verification Inc. All right reserved.
+        </p>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script
+  async
+  src="https://www.googletagmanager.com/gtag/js?id=UA-163311512-1"
+></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag() {
+    dataLayer.push(arguments);
+  }
+  gtag("js", new Date());
+  gtag("config", "UA-163311512-1");
+</script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Typist/1.2/typist.min.js"></script>
+    <script src="../../../../assets/js/index.js"></script>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=G-QL0D8HRYFW"
+    ></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+      gtag("config", "G-QL0D8HRYFW");
+    </script>
+  </body>
+</html>

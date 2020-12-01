@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+<meta charset="utf-8" />
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1.0, maximum-scale=1.0"
+/>
+<meta
+  name="description"
+  content="K Semantics of the Ethereum Virtual Machine (EVM)"
+/>
+<meta name="keywords" content="runtime, verification, rv, k" />
+<meta name="author" content="EVM Semantics | Runtime Verification Inc" />
+<meta name="robots" content="index, follow" />
+
+<!--favicon icon-->
+<link rel="icon" type="image/png" href="../../../assets/img/favicon.ico" />
+
+<title>KEVM: Semantics of EVM in K | evm-semantics</title>
+
+<!-- <base href="/k/" /> -->
+
+<!--web fonts-->
+<link
+  href="https://fonts.googleapis.com/css?family=Nunito:300,400,600,700,800"
+  rel="stylesheet"
+/>
+<link
+  href="https://fonts.googleapis.com/css?family=Lora:400i"
+  rel="stylesheet"
+/>
+
+<link
+  href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.14.0/css/all.min.css"
+  rel="stylesheet"
+/>
+
+<link href="../../../assets/css/index.css" rel="stylesheet" />
+
+<!--[if (gt IE 9) |!(IE)]><!-->
+<!--<link rel="stylesheet" href="/assets/vendor/custom-nav/css/effects/fade-menu.css"/>-->
+<!-- <link rel="stylesheet" href="../../../assets/k/vl-nav/css/effects/slide-menu.css" /> -->
+<!--<![endif]-->
+
+  </head>
+
+  <body>
+<header
+  class="navbar navbar-expand navbar-dark flex-column flex-md-row bd-navbar"
+>
+  <a class="logo-link" href="../../../index.html"> EVM Semantics </a>
+  <ul class="navbar-nav ml-md-auto">
+    <li class="nav-item">
+      <a
+        class="nav-link pl-2 pr-1 mx-1 py-3 my-n2"
+        href="https://github.com/kframework/evm-semantics"
+        target="_blank"
+        rel="noopener"
+        aria-label="GitHub"
+      >
+        <i class="fab fa-github"></i>
+      </a>
+    </li>
+  </ul>
+  <!--
+  <a
+    class="btn btn-rv-blue d-none d-lg-inline-block mb-3 mb-md-0 ml-md-3"
+    href="../../../downloads"
+    >Download</a
+  >
+  -->
+</header>
+
+
+    <div class="container-fluid">
+      <div class="row flex-xl-nowrap">
+<div class="col-12 col-md-3 col-xl-2 bd-sidebar mb-3">
+  <form
+    role="search"
+    class="bd-search d-flex align-items-center justify-content-between"
+  >
+    <input
+      type="search"
+      class="form-control"
+      placeholder="Search..."
+      aria-label="Search for..."
+      autocomplete="false"
+      id="search-box"
+    />
+    <button
+      class="btn bd-search-docs-toggle d-md-none p-0 ml-3 collapsed"
+      type="button"
+      aria-label="Toggle docs navigation"
+      style="font-size: 1.4rem"
+    >
+      <i class="fas fa-bars"></i>
+    </button>
+  </form>
+  <nav class="collapse bd-links" aria-label="Main navigation">
+    <div class="bd-toc-item">
+      <a class="bd-toc-link" href="../../../">Homepage</a>
+      <a class="bd-toc-link" href="../../../INSTALL">Install</a>
+    </div>
+  </nav>
+</div>
+
+        <main
+          class="col-12 col-md-9 col-xl-8 py-md-3 pl-md-5 bd-content"
+          role="main"
+        >
+          <div class="markdown-preview"><html><head></head><body><h1 id="release-versioning">Release Versioning</h1>
+<p>Releases for the tests library follow <a href="https://semver.org/" target="_blank" rel="noopener">semantic versioning</a>:</p>
+<ul>
+<li>Major number updates every time there is a backwards incompatibility for test runners, e.g.
+<ul>
+<li>New fork rules</li>
+<li>Backwards-incompatible format changes</li>
+</ul>
+</li>
+<li>Minor number updates when new tests are added that are backwards compatible</li>
+<li>Patch number updates if an existing test is bugfixed</li>
+</ul>
+<p>Here is an example how a follow-up release line could look like:</p>
+<ul>
+<li>v6-alpha - starting to implement EIPs, but not all EIPs are finalized</li>
+<li>v6-beta - all EIPs finalized, but some tests still in progress</li>
+<li>v6.0.0 - all desired coverage for Constantinople tests to be considered &quot;done enough&quot;</li>
+<li>v6.1.0 - more coverage added</li>
+<li>v6.2.0 - more coverage added</li>
+<li>v6.2.1 - bugfix on one of the tests</li>
+<li>v7.0.0 - change in test format output (if backwards incompatible)</li>
+</ul>
+<h1 id="release-notes">Release Notes</h1>
+<h2 id="v7.0.0-beta.1">v7.0.0-beta.1</h2>
+<p>This is the first <code>Ethereum</code> tests release with broader <code>Istanbul</code> support,
+see the &quot;Istanbul support&quot; section for a list with relevant PRs.</p>
+<p>This release also comes with some structural changes to the test folder layout,
+the most important ones being the introduction of a new separate <code>LegacyTests</code>
+test suite for state tests up to <code>Constantinople</code>, a new sub folder structure
+for <code>BlockchainTests</code> and a new separate suite <code>GeneralStateTests/stTimeConsuming/</code>
+for time consuming tests. For further details please have a look at the
+&quot;Test Format Changes&quot; section.</p>
+<h3 id="istanbul-support">Istanbul Support</h3>
+<h4 id="eip-test-support">EIP Test Support</h4>
+<ul>
+<li><a href="https://github.com/ethereum/EIPs/pull/2129" target="_blank" rel="noopener">EIP-152</a>: Blake2b <code>F</code> precompile,
+<code>CALL</code> and <code>CALLCODE</code> tests added for the standard unit test vectors for
+Blake2b <code>F</code>,
+PR <a href="https://github.com/ethereum/tests/pull/619" target="_blank" rel="noopener">#619</a></li>
+<li><a href="https://eips.ethereum.org/EIPS/eip-1344" target="_blank" rel="noopener">EIP-1344</a>: ChainID opcode, state
+tests added in PR <a href="https://github.com/ethereum/tests/pull/627" target="_blank" rel="noopener">#627</a></li>
+<li><a href="https://eips.ethereum.org/EIPS/eip-1884" target="_blank" rel="noopener">EIP-1884</a>: Repricing for
+trie-size-dependent opcodes, <code>SELFBALANCE</code> and <code>SLOAD</code> gas cost tests added
+in PR <a href="https://github.com/ethereum/tests/pull/627" target="_blank" rel="noopener">#627</a></li>
+</ul>
+<h4 id="test-regeneration">Test Regeneration</h4>
+<ul>
+<li>Regeneration of <code>BlockchainTests/GeneralStateTests</code> (<code>hive</code> tests),
+PR <a href="https://github.com/ethereum/tests/pull/632" target="_blank" rel="noopener">#632</a></li>
+<li>Updated <code>TransactionTests/</code> to <code>Istanbul</code>,
+PR <a href="https://github.com/ethereum/tests/pull/633" target="_blank" rel="noopener">#633</a></li>
+<li>Updated state tests with latest <code>lllc</code>,
+PR <a href="https://github.com/ethereum/tests/pull/635" target="_blank" rel="noopener">#635</a></li>
+<li>Updated <code>GeneralStateTests</code> to <code>Istanbul</code>,
+PR <a href="https://github.com/ethereum/tests/pull/639" target="_blank" rel="noopener">#639</a></li>
+</ul>
+<h3 id="constantinople%2Fpetersburg-updates">Constantinople/Petersburg Updates</h3>
+<p>The following tests touching Constantinople/Petersburg behavior have been added
+or updated since the last release:</p>
+<ul>
+<li>Added <code>ConstantinopleFix</code> (aka <code>Petersburg</code>) tests,
+PR <a href="https://github.com/ethereum/tests/pull/582" target="_blank" rel="noopener">#582</a></li>
+<li>Updated <code>ByzantiumToConstantinople</code> transition test to
+<code>ByzantiumToConstantinopleFix</code>
+(see <code>BlockchainTests/TransitionTests</code>),
+PR <a href="https://github.com/ethereum/tests/pull/583" target="_blank" rel="noopener">#583</a>,
+PR <a href="https://github.com/ethereum/tests/pull/588" target="_blank" rel="noopener">#588</a></li>
+<li>New <code>SAR</code>, <code>SHL</code>, <code>SHR</code> combinations,
+PR <a href="https://github.com/ethereum/tests/pull/574" target="_blank" rel="noopener">#574</a></li>
+</ul>
+<h3 id="test-format-changes">Test Format Changes</h3>
+<ul>
+<li>New <code>LegacyTests</code> suite for <code>BlockchainTests/GeneralStateTests</code> and
+<code>GeneralStateTests</code> for HFs up to <code>Constantinople</code> (so not:
+<code>ConstantinopleFix</code> aka <code>Petersburg</code>),
+PR <a href="https://github.com/ethereum/tests/pull/623" target="_blank" rel="noopener">#623</a></li>
+<li>New subfolder structure for <code>BlockchainTests</code> with added folders
+for <code>InvalidBlocks</code> and <code>ValidBlocks</code>,
+PR <a href="https://github.com/ethereum/tests/pull/605" target="_blank" rel="noopener">#605</a></li>
+<li>New separate suite <code>GeneralStateTests/stTimeConsuming/</code> for time
+consuming tests,
+PR <a href="https://github.com/ethereum/tests/pull/595" target="_blank" rel="noopener">#595</a></li>
+<li>Moved blockchain specific tests from <code>GeneralStateTests</code> to
+<code>BlockchainTests</code>,
+PR <a href="https://github.com/ethereum/tests/pull/590" target="_blank" rel="noopener">#590</a></li>
+<li>Old unmaintained RPC test scripts in <code>RPCTests</code> have been removed,
+PR <a href="https://github.com/ethereum/tests/pull/573" target="_blank" rel="noopener">#573</a></li>
+</ul>
+<h3 id="retesteth-%2F-rpc">Retesteth / RPC</h3>
+<ul>
+<li>Added <code>Istanbul</code> to <code>Retesteth</code> configuration,
+PR <a href="https://github.com/ethereum/tests/pull/638" target="_blank" rel="noopener">#638</a></li>
+<li>Updated <code>Retesteth</code> configurations,
+PR <a href="https://github.com/ethereum/tests/pull/634" target="_blank" rel="noopener">#634</a></li>
+<li>Default <code>Retesteth</code> genesis configurations,
+PR <a href="https://github.com/ethereum/tests/pull/625" target="_blank" rel="noopener">#625</a></li>
+<li>Added <code>Retesteth</code> configuration for <code>Pantheon</code> client,
+PR <a href="https://github.com/ethereum/tests/pull/622" target="_blank" rel="noopener">#622</a></li>
+<li>Autokill <code>Geth</code> threads in <code>startGethThreads.sh</code>,
+PR <a href="https://github.com/ethereum/tests/pull/613" target="_blank" rel="noopener">#613</a></li>
+<li>Added fork configurations to <code>Geth</code> config,
+PR <a href="https://github.com/ethereum/tests/pull/602" target="_blank" rel="noopener">#602</a></li>
+<li>Fixed <code>BlockchainTests</code> <code>RPC</code> issues,
+PR <a href="https://github.com/ethereum/tests/pull/594" target="_blank" rel="noopener">#594</a></li>
+</ul>
+<h3 id="general-test-additions">General Test Additions</h3>
+<ul>
+<li>More <code>RLP</code> invalid tests for non-optimal lengths
+(see <code>RLPTests/</code>),
+PR <a href="https://github.com/ethereum/tests/pull/612" target="_blank" rel="noopener">#612</a></li>
+<li>More tests on touching precompiles along <code>REVERT</code> usage
+(see <code>GeneralStateTests/stRevertTest/*Touch*.json</code>),
+PR <a href="https://github.com/ethereum/tests/pull/580" target="_blank" rel="noopener">#580</a>,
+PR <a href="https://github.com/ethereum/tests/pull/610" target="_blank" rel="noopener">#610</a></li>
+<li>New <code>sStore</code> test with non-zero nonce on collision
+(see <code>GeneralStateTests/stSStoreTest/InitCollisionNonZeroNonce.json</code>),
+PR <a href="https://github.com/ethereum/tests/pull/578" target="_blank" rel="noopener">#578</a></li>
+</ul>
+<h3 id="bug-fixes%2Foptimizations">Bug Fixes/Optimizations</h3>
+<ul>
+<li>Corrected tests with a missing <code>expect</code> section,
+PR <a href="https://github.com/ethereum/tests/pull/624" target="_blank" rel="noopener">#624</a></li>
+<li>Refill of all <code>BlockchainTests/GeneralStateTests/</code>,
+PR <a href="https://github.com/ethereum/tests/pull/621" target="_blank" rel="noopener">#621</a></li>
+<li>Removed post sections with no post conditions,
+PR <a href="https://github.com/ethereum/tests/pull/618" target="_blank" rel="noopener">#618</a></li>
+<li>Corrected huge expect sections in state tests
+(see <code>stAttackTest/</code>, &apos;stQuadraticComplexity/&apos;),
+PR <a href="https://github.com/ethereum/tests/pull/617" target="_blank" rel="noopener">#617</a></li>
+<li>Compressed huge state data in <code>bcExploitTest</code> tests,
+PR <a href="https://github.com/ethereum/tests/pull/616" target="_blank" rel="noopener">#616</a></li>
+<li>Removed ambiguous test in
+<code>BlockchainTests/ValidBlocks/bcMultiChainTest/ChainAtoChainB_blockorder2.json</code>,
+PR <a href="https://github.com/ethereum/tests/pull/615" target="_blank" rel="noopener">#615</a></li>
+<li>Fixed <code>RevertPrecompiledTouch</code> test,
+PR <a href="https://github.com/ethereum/tests/pull/609" target="_blank" rel="noopener">#609</a></li>
+<li>Converted blockchain specific state tests into <code>BlockchainTests</code>,
+PR <a href="https://github.com/ethereum/tests/pull/607" target="_blank" rel="noopener">#607</a></li>
+<li>Various test fixes,
+PR <a href="https://github.com/ethereum/tests/pull/603" target="_blank" rel="noopener">#603</a></li>
+<li>Fixes and updates to various state tests,
+PR <a href="https://github.com/ethereum/tests/pull/599" target="_blank" rel="noopener">#599</a></li>
+<li>Fixed <code>0x</code> missing in <code>transaction</code> -&gt; <code>data</code> in <code>GeneralStateTests</code>,
+PR <a href="https://github.com/ethereum/tests/pull/598" target="_blank" rel="noopener">#598</a></li>
+<li>Removed a test case from <code>badOpcodes</code> state tests
+(see <code>GeneralStateTests/stBadOpcode/</code>),
+PR <a href="https://github.com/ethereum/tests/pull/592" target="_blank" rel="noopener">#592</a></li>
+<li>Fixed <code>gasLimit</code> issue in <code>GeneralStateTests</code>,
+PR <a href="https://github.com/ethereum/tests/pull/590" target="_blank" rel="noopener">#590</a></li>
+<li>Consistently use <code>0x</code> prefixes in <code>RLPTests</code>,
+PR <a href="https://github.com/ethereum/tests/pull/587" target="_blank" rel="noopener">#587</a></li>
+<li>Removed underspecified <code>lotsOfBranches</code> test
+(see <code>BlockchainTests/bcTotalDifficultyTest/lotsOfBranches.json</code>),
+PR <a href="https://github.com/ethereum/tests/pull/579" target="_blank" rel="noopener">#579</a></li>
+<li>Changed <code>gasUsed</code> to 0 in <code>genesisBlockHeader</code> for <code>dataTx</code> tests
+(see <code>BlockchainTests/bcValidBlockTest/dataTx.json</code> and <code>dataTx2.json</code>),
+PR <a href="https://github.com/ethereum/tests/pull/577" target="_blank" rel="noopener">#577</a></li>
+</ul>
+<h2 id="v6.0.0-beta.3">v6.0.0-beta.3</h2>
+<h3 id="potentially-breaking-changes">Potentially breaking changes</h3>
+<ul>
+<li>
+<p>#547 requires your integration to understand the network <code>ByzantiumToConstantinopleAt5</code>, which is analogous to existing pseudo networks such as <code>FrontierToHomesteadAt5</code> and <code>EIP158ToByzantiumAt5</code>.</p>
+</li>
+<li>
+<p>#557 changes the format of the rlp tests, byte strings are now prefixed with &quot;0x&quot;</p>
+</li>
+</ul>
+<h3 id="eip-1234"><a href="https://eips.ethereum.org/EIPS/eip-1234" target="_blank" rel="noopener">EIP 1234</a></h3>
+<ul>
+<li>#547 added a test for the difficulty changes. This adds the network <code>ByzantiumToConstantinopleAt5</code>, which is analogous to existing networks such as <code>FrontierToHomesteadAt5</code> and <code>EIP158ToByzantiumAt5</code>.</li>
+</ul>
+<h3 id="eip-1052"><a href="https://eips.ethereum.org/EIPS/eip-1052" target="_blank" rel="noopener">EIP 1052</a></h3>
+<ul>
+<li>#548 Added a test for EXTCODEHASH called on an account created in the same transaction</li>
+<li>#549 added a few more tests for EXTCODEHASH and EXTCODESIZE on accounts created in the same transaction</li>
+<li>#550 Checks that changes to an account&apos;s nonce, balance, or storage do not change the result of calling EXTCODEHASH</li>
+<li>#552 Added another EXTCODEHASH test, what if it&apos;s run on accounts which have self-destructed?</li>
+<li>#563 Another spectacularly detailed test case of EXTCODEHASH involving recursive calls and oog-induced revert</li>
+<li>#566 checks that EXTCODEHASH returns a different result when the code changes</li>
+<li>#568 adds a test for EXTCODEHASH; what if the contract being hashed self destructed while in the middle of a delegate call?</li>
+<li>#569 calls EXTCODEHASH on an empty contract</li>
+</ul>
+<h3 id="misc">Misc</h3>
+<ul>
+<li>#551 tests for a Constantinople bug the fuzzer found in geth</li>
+<li>#544 adds an RLP test, <a href="https://github.com/mana-ethereum/ex_rlp/pull/17" target="_blank" rel="noopener">courtesy of the mana team</a></li>
+<li>#557 changes the format of the rlp tests, byte strings are now prefixed with &quot;0x&quot;</li>
+<li>#561 changed some of the tests. There were some changes to <code>testeth</code> which made the previous tests impossible to regenerate. They were refactored but not in a way which should break any client.</li>
+<li>#567 adds a Constantinople test Mana found when they failed to sync with Ropsten</li>
+</ul>
+<h2 id="v6.0.0-beta.2-release-cw-46">v6.0.0-beta.2 Release CW 46</h2>
+<h3 id="constantinople-test-updates">Constantinople Test Updates</h3>
+<ul>
+<li>Added initial test cases for <code>EXTCODEHASH</code> <a href="https://eips.ethereum.org/EIPS/eip-1052" target="_blank" rel="noopener">EIP-1052</a>, see PR <a href="https://github.com/ethereum/tests/pull/484" target="_blank" rel="noopener">#484</a></li>
+<li>More <code>EXTCODEHASH</code> tests, see PR <a href="https://github.com/ethereum/tests/pull/544" target="_blank" rel="noopener">#544</a></li>
+<li>New <code>SSTORE</code> state tests and blockchain tests where an external call is overwriting/colliding with new <code>SSTORE</code> gas calculation rules, see PR <a href="https://github.com/ethereum/tests/pull/535" target="_blank" rel="noopener">#535</a></li>
+</ul>
+<h3 id="test-coverage">Test Coverage</h3>
+<ul>
+<li>New tests to cover cases where the result of an EVM opcode is written to a specified memory range and the result is shorter than the specified range, see PR <a href="https://github.com/ethereum/tests/pull/538" target="_blank" rel="noopener">#538</a></li>
+</ul>
+<h3 id="library-changes">Library Changes</h3>
+<ul>
+<li>Added <code>.idea</code> to <code>.gitignore</code>, see PR <a href="https://github.com/ethereum/tests/pull/546" target="_blank" rel="noopener">#546</a></li>
+</ul>
+<h3 id="docs">Docs</h3>
+<p><a href="https://ethereum-tests.readthedocs.io/en/latest/generating-tests.html" target="_blank" rel="noopener">Test generation docs</a> have been consolidated and integrated in the central ReadTheDocs testing documentation.</p>
+<p>We also updated outdated parts on this doc section (see PR <a href="https://github.com/ethereum/tests/pull/539" target="_blank" rel="noopener">#539</a>), so it should in principle now be possible to follow the guide and end up with a working test creation setup. There might still be some glitches, please let us know or submit a PR on <a href="https://github.com/ethereum/tests" target="_blank" rel="noopener">ethereum/tests</a> to if you stumble over something.</p>
+<p>Other changes:</p>
+<ul>
+<li>New list with <a href="https://github.com/ethereum/tests#clients-using-the-library" target="_blank" rel="noopener">clients using the library</a> in README, see PR <a href="https://github.com/ethereum/tests/pull/537" target="_blank" rel="noopener">#537</a></li>
+</ul>
+<h2 id="v6.0.0-beta.1-release-cw-43">v6.0.0-beta.1 Release CW 43</h2>
+<h3 id="constantinople-test-summary">Constantinople Test Summary</h3>
+<ul>
+<li><code>EIP-145</code> (Bitwise shifting): Tests for <code>SAR</code>, <code>SHL</code> and <code>SHR</code> in <a href="https://github.com/ethereum/tests/tree/develop/GeneralStateTests/stShift" target="_blank" rel="noopener">GeneralStateTests/stShift</a> directory, blockchain tests analogue</li>
+<li><code>EIP-1014</code> (<code>CREATE2</code>): Various cases covered in <a href="https://github.com/ethereum/tests/tree/develop/GeneralStateTests/stCreate2" target="_blank" rel="noopener">GeneralStateTests/stCreate2</a> directory, blockchain tests analogue</li>
+<li><code>EIP-1052</code> (<code>EXTCODEHASH</code>): Tests not merged yet, open PR <a href="https://github.com/ethereum/tests/pull/484" target="_blank" rel="noopener">#484</a></li>
+<li><code>EIP-1283</code> (<code>SSTORE</code>): Dedicated tests in <a href="https://github.com/ethereum/tests/tree/develop/GeneralStateTests/stSStoreTest" target="_blank" rel="noopener">GeneralStateTests/stSStoreTest</a> directory also covering Ropsten consensus issue cases, blockchain tests analogue, generally refilled state tests with new <code>SSTORE</code> gas metering rules in PR <a href="https://github.com/ethereum/tests/pull/511" target="_blank" rel="noopener">#511</a></li>
+<li><code>EIP-1234</code> (difficulty): New <code>difficultyConstantinople.json</code> file and regenerated <code>difficultyRopsten.json</code> files in the <a href="https://github.com/ethereum/tests/blob/develop/BasicTests/" target="_blank" rel="noopener">BasicTests</a> directory, see PR <a href="https://github.com/ethereum/tests/pull/518" target="_blank" rel="noopener">#518</a></li>
+</ul>
+<h3 id="library-changes-1">Library Changes</h3>
+<p>Be aware that the format of BlockchainTests recently changed with the introduction of a new field <code>sealEngine</code> (values: <code>NoProof</code> | <code>Ethash</code>), see related JSON Schema <a href="https://github.com/ethereum/tests/commit/3be71ec3364a01fd4f2cb9b9fd086f3f69f0225c" target="_blank" rel="noopener">change</a> or BlockchainTest format <a href="https://ethereum-tests.readthedocs.io/en/latest/test_types/blockchain_tests.html" target="_blank" rel="noopener">docs</a> for reference.</p>
+<p>This means that you can faster-execute <code>NoProof</code> based tests skipping block validation. These tests nevertheless doesn&apos;t provide reliable values for <code>PoW</code>-based block header fields any more (<code>mixHash</code>, <code>nonce</code>), so make sure that you don&apos;t rely on the correctness of these values for the tests to pass.</p>
+</body></html></div>
+        </main>
+      </div>
+    </div>
+<footer class="app-footer text-md-left text-center">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-md-2 mb-md-0 mb-4">
+        <span class="pr-md-5 pr-0 py-3">
+          <a href="https://runtimeverification.com" target="_blank">
+            <picture>
+              <source
+                srcset="../../../assets/img/rv-logo-dark.png"
+                media="(prefers-color-scheme: dark)"
+              />
+              <img
+                class="pr-3 footer-logo"
+                src="../../../assets/img/rv-logo.png"
+                alt="Runtime Verification Inc logo"
+              />
+            </picture>
+          </a>
+        </span>
+      </div>
+      <div class="col-md-6 mb-md-0 mb-4"></div>
+      <div class="col-md-4 text-md-right">
+        <p class="copyright">
+          &copy; 2020 Runtime Verification Inc. All right reserved.
+        </p>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script
+  async
+  src="https://www.googletagmanager.com/gtag/js?id=UA-163311512-1"
+></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag() {
+    dataLayer.push(arguments);
+  }
+  gtag("js", new Date());
+  gtag("config", "UA-163311512-1");
+</script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Typist/1.2/typist.min.js"></script>
+    <script src="../../../assets/js/index.js"></script>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=G-QL0D8HRYFW"
+    ></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+      gtag("config", "G-QL0D8HRYFW");
+    </script>
+  </body>
+</html>

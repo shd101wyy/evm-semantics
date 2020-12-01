@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+<meta charset="utf-8" />
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1.0, maximum-scale=1.0"
+/>
+<meta
+  name="description"
+  content="K Semantics of the Ethereum Virtual Machine (EVM)"
+/>
+<meta name="keywords" content="runtime, verification, rv, k" />
+<meta name="author" content="EVM Semantics | Runtime Verification Inc" />
+<meta name="robots" content="index, follow" />
+
+<!--favicon icon-->
+<link rel="icon" type="image/png" href="../../../../assets/img/favicon.ico" />
+
+<title>KEVM: Semantics of EVM in K | evm-semantics</title>
+
+<!-- <base href="/k/" /> -->
+
+<!--web fonts-->
+<link
+  href="https://fonts.googleapis.com/css?family=Nunito:300,400,600,700,800"
+  rel="stylesheet"
+/>
+<link
+  href="https://fonts.googleapis.com/css?family=Lora:400i"
+  rel="stylesheet"
+/>
+
+<link
+  href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.14.0/css/all.min.css"
+  rel="stylesheet"
+/>
+
+<link href="../../../../assets/css/index.css" rel="stylesheet" />
+
+<!--[if (gt IE 9) |!(IE)]><!-->
+<!--<link rel="stylesheet" href="/assets/vendor/custom-nav/css/effects/fade-menu.css"/>-->
+<!-- <link rel="stylesheet" href="../../../../assets/k/vl-nav/css/effects/slide-menu.css" /> -->
+<!--<![endif]-->
+
+  </head>
+
+  <body>
+<header
+  class="navbar navbar-expand navbar-dark flex-column flex-md-row bd-navbar"
+>
+  <a class="logo-link" href="../../../../index.html"> EVM Semantics </a>
+  <ul class="navbar-nav ml-md-auto">
+    <li class="nav-item">
+      <a
+        class="nav-link pl-2 pr-1 mx-1 py-3 my-n2"
+        href="https://github.com/kframework/evm-semantics"
+        target="_blank"
+        rel="noopener"
+        aria-label="GitHub"
+      >
+        <i class="fab fa-github"></i>
+      </a>
+    </li>
+  </ul>
+  <!--
+  <a
+    class="btn btn-rv-blue d-none d-lg-inline-block mb-3 mb-md-0 ml-md-3"
+    href="../../../../downloads"
+    >Download</a
+  >
+  -->
+</header>
+
+
+    <div class="container-fluid">
+      <div class="row flex-xl-nowrap">
+<div class="col-12 col-md-3 col-xl-2 bd-sidebar mb-3">
+  <form
+    role="search"
+    class="bd-search d-flex align-items-center justify-content-between"
+  >
+    <input
+      type="search"
+      class="form-control"
+      placeholder="Search..."
+      aria-label="Search for..."
+      autocomplete="false"
+      id="search-box"
+    />
+    <button
+      class="btn bd-search-docs-toggle d-md-none p-0 ml-3 collapsed"
+      type="button"
+      aria-label="Toggle docs navigation"
+      style="font-size: 1.4rem"
+    >
+      <i class="fas fa-bars"></i>
+    </button>
+  </form>
+  <nav class="collapse bd-links" aria-label="Main navigation">
+    <div class="bd-toc-item">
+      <a class="bd-toc-link" href="../../../../">Homepage</a>
+      <a class="bd-toc-link" href="../../../../INSTALL">Install</a>
+    </div>
+  </nav>
+</div>
+
+        <main
+          class="col-12 col-md-9 col-xl-8 py-md-3 pl-md-5 bd-content"
+          role="main"
+        >
+          <div class="markdown-preview"><html><head></head><body><h1 id="cryptographic-primitives">Cryptographic Primitives</h1>
+<p>Here we implement the various cryptographic primitives needed for various blockchain systems.</p>
+<pre class="language-k"><code><span class="token keyword">module</span> KRYPTO
+    <span class="token keyword">imports</span> STRING<span class="token operator">-</span>SYNTAX
+    <span class="token keyword">imports</span> INT<span class="token operator">-</span>SYNTAX
+    <span class="token keyword">imports</span> LIST
+</code></pre>
+<h2 id="hash-functions">Hash Functions</h2>
+<p>In hooked hash functions, <code>String</code> inputs are interpreted as byte arrays, i.e. they are NOT hex-encoded.
+<code>String</code> outputs are interpreted differently depending on which class of hooked hash functions they belong to:</p>
+<ul>
+<li>hex-encoded - return binary data as hex-encoded strings</li>
+<li>raw         - return binary data as raw strings (i.e. NO hex-encoding)</li>
+</ul>
+<h3 id="hooked-hash-functions-with-hex-encoded-outputs">Hooked Hash Functions with Hex Encoded Outputs</h3>
+<ul>
+<li><code>Keccak256</code> takes a string and returns a 64-character hex-encoded string of the 32-byte keccak256 hash of the string.</li>
+<li><code>Sha256</code> takes a string and returns a 64-character hex-encoded string of the 32-byte SHA2-256 hash of the string.</li>
+<li><code>Sha512</code> takes a string and returns a 128-character hex-encoded string of the 64-byte SHA2-512 hash of the string.</li>
+<li><code>Sha3_256</code> takes a string and returns 64-character hex-encoded string of the 32-byte SHA3-256 hash of the string.</li>
+<li><code>RipEmd160</code> takes a string and returns a 40-character hex-encoded string of the 20-byte RIPEMD160 hash of the string.</li>
+<li><code>Blake2Compress</code> takes a raw string containing a packed encoding of the arguments to the Blake2b compression
+function F and returns a 128-character hex-encoded string of the 64-byte result from the compression function.</li>
+</ul>
+<pre class="language-k"><code>    <span class="token keyword">syntax</span> <span class="token keyword">String</span> <span class="token punctuation">:</span><span class="token punctuation">:</span><span class="token operator">=</span> Keccak256 <span class="token punctuation">(</span> <span class="token keyword">String</span> <span class="token punctuation">)</span>                            <span class="token punctuation">[</span>function<span class="token punctuation">,</span> hook<span class="token punctuation">(</span>KRYPTO<span class="token punctuation">.</span>keccak256<span class="token punctuation">)</span><span class="token punctuation">]</span>
+                    <span class="token operator">|</span> Sha256 <span class="token punctuation">(</span> <span class="token keyword">String</span> <span class="token punctuation">)</span>                               <span class="token punctuation">[</span>function<span class="token punctuation">,</span> hook<span class="token punctuation">(</span>KRYPTO<span class="token punctuation">.</span>sha256<span class="token punctuation">)</span><span class="token punctuation">]</span>
+                    <span class="token operator">|</span> Sha512 <span class="token punctuation">(</span> <span class="token keyword">String</span> <span class="token punctuation">)</span>                               <span class="token punctuation">[</span>function<span class="token punctuation">,</span> hook<span class="token punctuation">(</span>KRYPTO<span class="token punctuation">.</span>sha512<span class="token punctuation">)</span><span class="token punctuation">]</span>
+                    <span class="token operator">|</span> <span class="token string">&quot;Sha3_256&quot;</span> <span class="token string">&quot;(&quot;</span> <span class="token keyword">String</span> <span class="token string">&quot;)&quot;</span>                       <span class="token punctuation">[</span>function<span class="token punctuation">,</span> hook<span class="token punctuation">(</span>KRYPTO<span class="token punctuation">.</span>sha3<span class="token punctuation">)</span><span class="token punctuation">]</span>
+                    <span class="token operator">|</span> RipEmd160 <span class="token punctuation">(</span> <span class="token keyword">String</span> <span class="token punctuation">)</span>                            <span class="token punctuation">[</span>function<span class="token punctuation">,</span> hook<span class="token punctuation">(</span>KRYPTO<span class="token punctuation">.</span>ripemd160<span class="token punctuation">)</span><span class="token punctuation">]</span>
+                    <span class="token operator">|</span> Blake2Compress <span class="token punctuation">(</span> <span class="token keyword">String</span> <span class="token punctuation">)</span>                       <span class="token punctuation">[</span>function<span class="token punctuation">,</span> hook<span class="token punctuation">(</span>KRYPTO<span class="token punctuation">.</span>blake2compress<span class="token punctuation">)</span><span class="token punctuation">]</span>
+ <span class="token comment">// ---------------------------------------------------------------------------------------------------------</span>
+</code></pre>
+<h3 id="hooked-hash-functions-with-raw-outputs">Hooked Hash Functions with Raw Outputs</h3>
+<p>These functions compute the same hash function as those named above except that they return a raw string.</p>
+<pre class="language-k"><code>    <span class="token keyword">syntax</span> <span class="token keyword">String</span> <span class="token punctuation">:</span><span class="token punctuation">:</span><span class="token operator">=</span> Keccak256raw <span class="token punctuation">(</span> <span class="token keyword">String</span> <span class="token punctuation">)</span>                         <span class="token punctuation">[</span>function<span class="token punctuation">,</span> hook<span class="token punctuation">(</span>KRYPTO<span class="token punctuation">.</span>keccak256raw<span class="token punctuation">)</span><span class="token punctuation">]</span>
+                    <span class="token operator">|</span> Sha256raw <span class="token punctuation">(</span> <span class="token keyword">String</span> <span class="token punctuation">)</span>                            <span class="token punctuation">[</span>function<span class="token punctuation">,</span> hook<span class="token punctuation">(</span>KRYPTO<span class="token punctuation">.</span>sha256raw<span class="token punctuation">)</span><span class="token punctuation">]</span>
+                    <span class="token operator">|</span> Sha512raw <span class="token punctuation">(</span> <span class="token keyword">String</span> <span class="token punctuation">)</span>                            <span class="token punctuation">[</span>function<span class="token punctuation">,</span> hook<span class="token punctuation">(</span>KRYPTO<span class="token punctuation">.</span>sha512raw<span class="token punctuation">)</span><span class="token punctuation">]</span>
+                    <span class="token operator">|</span> <span class="token string">&quot;Sha3_256raw&quot;</span> <span class="token string">&quot;(&quot;</span> <span class="token keyword">String</span> <span class="token string">&quot;)&quot;</span>                    <span class="token punctuation">[</span>function<span class="token punctuation">,</span> hook<span class="token punctuation">(</span>KRYPTO<span class="token punctuation">.</span>sha3raw<span class="token punctuation">)</span><span class="token punctuation">]</span>
+                    <span class="token operator">|</span> RipEmd160raw <span class="token punctuation">(</span> <span class="token keyword">String</span> <span class="token punctuation">)</span>                         <span class="token punctuation">[</span>function<span class="token punctuation">,</span> hook<span class="token punctuation">(</span>KRYPTO<span class="token punctuation">.</span>ripemd160raw<span class="token punctuation">)</span><span class="token punctuation">]</span>
+ <span class="token comment">// -------------------------------------------------------------------------------------------------------</span>
+</code></pre>
+<h3 id="other-hooked-hash-functions">Other Hooked Hash Functions</h3>
+<p>These hooked hash functions are broken on default Ubuntu installations because of a bug in <code>libcrypto++</code> package.
+As such, we we hide them behind a separate tangle tag to avoid breaking projects that do not use them.</p>
+<ul>
+<li><code>Blake2b256</code> takes a string and returns a 64-character hex-encoded string of the 32-byte Blake2b256 hash of the string.</li>
+<li><code>Blake2b256raw</code> takes a string and returns the 32-byte Blake2b256 hash of the string.</li>
+</ul>
+<pre class="language-text"><code>    syntax String ::= Blake2b256 ( String )                           [function, hook(KRYPTO.blake2b256)]
+                    | Blake2b256raw ( String )                        [function, hook(KRYPTO.blake2b256raw)]
+ // --------------------------------------------------------------------------------------------------------
+</code></pre>
+<h2 id="ecdsa-functions">ECDSA Functions</h2>
+<p>For hooked ECDSA functions, <code>String</code> inputs are interpreted as byte arrays, i.e. they are NOT hex-encoded.</p>
+<ul>
+<li><code>ECDSARecover</code> takes a 32-character byte string of a message, v, r, s of the signed message and returns the 64-character public key used to sign the message.</li>
+<li><code>ECDSASign</code> takes a 32-character byte string of a message hash, a 32-character byte string of a private key, and returns the 65 byte hex-encoded signature in [r,s,v] form</li>
+<li><code>ECDSAPubKey</code> takes a 32-character byte string of a private key, and returns the 64 byte hex-encoded public key
+See <a href="https://ethereum.stackexchange.com/questions/15766/what-does-v-r-s-in-eth-gettransactionbyhash-mean" target="_blank" rel="noopener">this StackOverflow post</a> for some information about v, r, and s.</li>
+</ul>
+<pre class="language-k"><code>    <span class="token keyword">syntax</span> <span class="token keyword">String</span> <span class="token punctuation">:</span><span class="token punctuation">:</span><span class="token operator">=</span> ECDSARecover <span class="token punctuation">(</span> <span class="token keyword">String</span> <span class="token punctuation">,</span> <span class="token keyword">Int</span> <span class="token punctuation">,</span> <span class="token keyword">String</span> <span class="token punctuation">,</span> <span class="token keyword">String</span> <span class="token punctuation">)</span> <span class="token punctuation">[</span>function<span class="token punctuation">,</span> hook<span class="token punctuation">(</span>KRYPTO<span class="token punctuation">.</span>ecdsaRecover<span class="token punctuation">)</span><span class="token punctuation">]</span>
+                    <span class="token operator">|</span> ECDSASign <span class="token punctuation">(</span> <span class="token keyword">String</span><span class="token punctuation">,</span> <span class="token keyword">String</span> <span class="token punctuation">)</span>                    <span class="token punctuation">[</span>function<span class="token punctuation">,</span> hook<span class="token punctuation">(</span>KRYPTO<span class="token punctuation">.</span>ecdsaSign<span class="token punctuation">)</span><span class="token punctuation">]</span>
+                    <span class="token operator">|</span> ECDSAPubKey <span class="token punctuation">(</span> <span class="token keyword">String</span> <span class="token punctuation">)</span>                          <span class="token punctuation">[</span>function<span class="token punctuation">,</span> hook<span class="token punctuation">(</span>KRYPTO<span class="token punctuation">.</span>ecdsaPubKey<span class="token punctuation">)</span><span class="token punctuation">]</span>
+ <span class="token comment">// ---------------------------------------------------------------------------------------------------------</span>
+</code></pre>
+<h2 id="bn128-curve-functions">BN128 Curve Functions</h2>
+<p>The BN128 elliptic curve is defined over 2-dimensional points over the fields of zero- and first-degree polynomials modulo a large prime. (x, y) is a point on G1, whereas (x1 x x2, y1 x y2) is a point on G2, in which x1 and y1 are zero-degree coefficients and x2 and y2 are first-degree coefficients. In each case, (0, 0) is used to represent the point at infinity.</p>
+<ul>
+<li><code>BN128Add</code> adds two points in G1 together,</li>
+<li><code>BN128Mul</code> multiplies a point in G1 by a scalar.</li>
+<li><code>BN128AtePairing</code> accepts a list of points in G1 and a list of points in G2 and returns whether the sum of the product of the discrete logarithm of the G1 points multiplied by the discrete logarithm of the G2 points is equal to zero.</li>
+<li><code>isValidPoint</code> takes a point in either G1 or G2 and validates that it actually falls on the respective elliptic curve.</li>
+</ul>
+<pre class="language-k"><code>    <span class="token keyword">syntax</span> G1Point <span class="token punctuation">:</span><span class="token punctuation">:</span><span class="token operator">=</span> <span class="token string">&quot;(&quot;</span> <span class="token keyword">Int</span> <span class="token string">&quot;,&quot;</span> <span class="token keyword">Int</span> <span class="token string">&quot;)&quot;</span> <span class="token punctuation">[</span><span class="token class-name">prefer</span><span class="token punctuation">]</span>
+    <span class="token keyword">syntax</span> G2Point <span class="token punctuation">:</span><span class="token punctuation">:</span><span class="token operator">=</span> <span class="token string">&quot;(&quot;</span> <span class="token keyword">Int</span> <span class="token string">&quot;x&quot;</span> <span class="token keyword">Int</span> <span class="token string">&quot;,&quot;</span> <span class="token keyword">Int</span> <span class="token string">&quot;x&quot;</span> <span class="token keyword">Int</span> <span class="token string">&quot;)&quot;</span>
+    <span class="token keyword">syntax</span> G1Point <span class="token punctuation">:</span><span class="token punctuation">:</span><span class="token operator">=</span> BN128Add<span class="token punctuation">(</span>G1Point<span class="token punctuation">,</span> G1Point<span class="token punctuation">)</span> <span class="token punctuation">[</span>function<span class="token punctuation">,</span> hook<span class="token punctuation">(</span>KRYPTO<span class="token punctuation">.</span>bn128add<span class="token punctuation">)</span><span class="token punctuation">]</span>
+                     <span class="token operator">|</span> BN128Mul<span class="token punctuation">(</span>G1Point<span class="token punctuation">,</span> <span class="token keyword">Int</span><span class="token punctuation">)</span>     <span class="token punctuation">[</span>function<span class="token punctuation">,</span> hook<span class="token punctuation">(</span>KRYPTO<span class="token punctuation">.</span>bn128mul<span class="token punctuation">)</span><span class="token punctuation">]</span>
+ <span class="token comment">// -------------------------------------------------------------------------------</span>
+
+    <span class="token keyword">syntax</span> <span class="token keyword">Bool</span> <span class="token punctuation">:</span><span class="token punctuation">:</span><span class="token operator">=</span> BN128AtePairing<span class="token punctuation">(</span>List<span class="token punctuation">,</span> List<span class="token punctuation">)</span> <span class="token punctuation">[</span>function<span class="token punctuation">,</span> hook<span class="token punctuation">(</span>KRYPTO<span class="token punctuation">.</span>bn128ate<span class="token punctuation">)</span><span class="token punctuation">]</span>
+ <span class="token comment">// -----------------------------------------------------------------------------</span>
+
+    <span class="token keyword">syntax</span> <span class="token keyword">Bool</span> <span class="token punctuation">:</span><span class="token punctuation">:</span><span class="token operator">=</span> isValidPoint<span class="token punctuation">(</span>G1Point<span class="token punctuation">)</span> <span class="token punctuation">[</span>function<span class="token punctuation">,</span> hook<span class="token punctuation">(</span>KRYPTO<span class="token punctuation">.</span>bn128valid<span class="token punctuation">)</span><span class="token punctuation">]</span>
+                  <span class="token operator">|</span> isValidPoint<span class="token punctuation">(</span>G2Point<span class="token punctuation">)</span> <span class="token punctuation">[</span>function<span class="token punctuation">,</span> <span class="token class-name">klabel</span><span class="token punctuation">(</span>isValidG2Point<span class="token punctuation">)</span><span class="token punctuation">,</span> hook<span class="token punctuation">(</span>KRYPTO<span class="token punctuation">.</span>bn128g2valid<span class="token punctuation">)</span><span class="token punctuation">]</span>
+ <span class="token comment">// ---------------------------------------------------------------------------------------------------</span>
+<span class="token keyword">endmodule</span>
+</code></pre>
+</body></html></div>
+        </main>
+      </div>
+    </div>
+<footer class="app-footer text-md-left text-center">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-md-2 mb-md-0 mb-4">
+        <span class="pr-md-5 pr-0 py-3">
+          <a href="https://runtimeverification.com" target="_blank">
+            <picture>
+              <source
+                srcset="../../../../assets/img/rv-logo-dark.png"
+                media="(prefers-color-scheme: dark)"
+              />
+              <img
+                class="pr-3 footer-logo"
+                src="../../../../assets/img/rv-logo.png"
+                alt="Runtime Verification Inc logo"
+              />
+            </picture>
+          </a>
+        </span>
+      </div>
+      <div class="col-md-6 mb-md-0 mb-4"></div>
+      <div class="col-md-4 text-md-right">
+        <p class="copyright">
+          &copy; 2020 Runtime Verification Inc. All right reserved.
+        </p>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script
+  async
+  src="https://www.googletagmanager.com/gtag/js?id=UA-163311512-1"
+></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag() {
+    dataLayer.push(arguments);
+  }
+  gtag("js", new Date());
+  gtag("config", "UA-163311512-1");
+</script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Typist/1.2/typist.min.js"></script>
+    <script src="../../../../assets/js/index.js"></script>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=G-QL0D8HRYFW"
+    ></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+      gtag("config", "G-QL0D8HRYFW");
+    </script>
+  </body>
+</html>

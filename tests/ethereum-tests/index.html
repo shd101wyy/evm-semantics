@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+<meta charset="utf-8" />
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1.0, maximum-scale=1.0"
+/>
+<meta
+  name="description"
+  content="K Semantics of the Ethereum Virtual Machine (EVM)"
+/>
+<meta name="keywords" content="runtime, verification, rv, k" />
+<meta name="author" content="EVM Semantics | Runtime Verification Inc" />
+<meta name="robots" content="index, follow" />
+
+<!--favicon icon-->
+<link rel="icon" type="image/png" href="../../assets/img/favicon.ico" />
+
+<title>KEVM: Semantics of EVM in K | evm-semantics</title>
+
+<!-- <base href="/k/" /> -->
+
+<!--web fonts-->
+<link
+  href="https://fonts.googleapis.com/css?family=Nunito:300,400,600,700,800"
+  rel="stylesheet"
+/>
+<link
+  href="https://fonts.googleapis.com/css?family=Lora:400i"
+  rel="stylesheet"
+/>
+
+<link
+  href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.14.0/css/all.min.css"
+  rel="stylesheet"
+/>
+
+<link href="../../assets/css/index.css" rel="stylesheet" />
+
+<!--[if (gt IE 9) |!(IE)]><!-->
+<!--<link rel="stylesheet" href="/assets/vendor/custom-nav/css/effects/fade-menu.css"/>-->
+<!-- <link rel="stylesheet" href="../../assets/k/vl-nav/css/effects/slide-menu.css" /> -->
+<!--<![endif]-->
+
+  </head>
+
+  <body>
+<header
+  class="navbar navbar-expand navbar-dark flex-column flex-md-row bd-navbar"
+>
+  <a class="logo-link" href="../../index.html"> EVM Semantics </a>
+  <ul class="navbar-nav ml-md-auto">
+    <li class="nav-item">
+      <a
+        class="nav-link pl-2 pr-1 mx-1 py-3 my-n2"
+        href="https://github.com/kframework/evm-semantics"
+        target="_blank"
+        rel="noopener"
+        aria-label="GitHub"
+      >
+        <i class="fab fa-github"></i>
+      </a>
+    </li>
+  </ul>
+  <!--
+  <a
+    class="btn btn-rv-blue d-none d-lg-inline-block mb-3 mb-md-0 ml-md-3"
+    href="../../downloads"
+    >Download</a
+  >
+  -->
+</header>
+
+
+    <div class="container-fluid">
+      <div class="row flex-xl-nowrap">
+<div class="col-12 col-md-3 col-xl-2 bd-sidebar mb-3">
+  <form
+    role="search"
+    class="bd-search d-flex align-items-center justify-content-between"
+  >
+    <input
+      type="search"
+      class="form-control"
+      placeholder="Search..."
+      aria-label="Search for..."
+      autocomplete="false"
+      id="search-box"
+    />
+    <button
+      class="btn bd-search-docs-toggle d-md-none p-0 ml-3 collapsed"
+      type="button"
+      aria-label="Toggle docs navigation"
+      style="font-size: 1.4rem"
+    >
+      <i class="fas fa-bars"></i>
+    </button>
+  </form>
+  <nav class="collapse bd-links" aria-label="Main navigation">
+    <div class="bd-toc-item">
+      <a class="bd-toc-link" href="../../">Homepage</a>
+      <a class="bd-toc-link" href="../../INSTALL">Install</a>
+    </div>
+  </nav>
+</div>
+
+        <main
+          class="col-12 col-md-9 col-xl-8 py-md-3 pl-md-5 bd-content"
+          role="main"
+        >
+          <div class="markdown-preview"><html><head></head><body><h1 id="ethereum-consensus-tests">Ethereum Consensus Tests   <a href="https://travis-ci.org/ethereum/tests" target="_blank" rel="noopener"><img src="https://travis-ci.org/ethereum/tests.svg?branch=develop" alt="Build Status"></a></h1>
+<p>Common tests for all clients to test against. Test execution tool: <a href="https://github.com/ethereum/retesteth" target="_blank" rel="noopener">https://github.com/ethereum/retesteth</a></p>
+<h2 id="test-formats">Test Formats</h2>
+<p>Maintained tests:</p>
+<pre class="language-text"><code>/BasicTests
+/BlockchainTests
+/GeneralStateTests
+/TransactionTests
+/RLPTest
+/src
+</code></pre>
+<p>See descriptions of the different test formats in the official documentation at  <a href="http://ethereum-tests.readthedocs.io/" target="_blank" rel="noopener">http://ethereum-tests.readthedocs.io/</a>.</p>
+<p><em>Note</em>:<br>
+The format of BlockchainTests recently changed with the introduction of a new field <code>sealEngine</code> (values: <code>NoProof</code> | <code>Ethash</code>), see related JSON Schema <a href="https://github.com/ethereum/tests/commit/3be71ec3364a01fd4f2cb9b9fd086f3f69f0225c" target="_blank" rel="noopener">change</a> or BlockchainTest format <a href="https://ethereum-tests.readthedocs.io/en/latest/test_types/blockchain_tests.html" target="_blank" rel="noopener">docs</a> for reference.</p>
+<p>This means that you can skip PoW validation for <code>NoProof</code> tests but also has the consequence that it is not possible to rely on/check <code>PoW</code> related block parameters for these tests any more.</p>
+<h2 id="clients-using-the-library">Clients using the library</h2>
+<p>The following clients make use of the tests from this library. You can use these implementations for inspiration on how to integrate. If your client is missing, please submit a PR (requirement: at least some minimal test documentation)!</p>
+<ul>
+<li><a href="https://github.com/mana-ethereum/mana" target="_blank" rel="noopener">Mana</a> (Elixir): <a href="https://github.com/mana-ethereum/mana#testing" target="_blank" rel="noopener">Docs</a>, Test location: <code>ethereum_common_tests</code></li>
+<li><a href="https://github.com/ethereum/go-ethereum" target="_blank" rel="noopener">go-ethereum</a> (Go): <a href="https://github.com/ethereum/go-ethereum/wiki/Developers&apos;-Guide" target="_blank" rel="noopener">Docs</a>, Test location: <code>tests/testdata</code></li>
+<li><a href="https://github.com/paritytech/parity-ethereum" target="_blank" rel="noopener">Parity Ethereum</a> (Rust): <a href="https://wiki.parity.io/Coding-guide" target="_blank" rel="noopener">Docs</a>, Test location: <code>ethcore/res/ethereum/tests</code></li>
+<li><a href="https://github.com/ethereumjs/ethereumjs-vm" target="_blank" rel="noopener">ethereumjs-vm</a> (JavaScript): <a href="https://github.com/ethereumjs/ethereumjs-vm#testing" target="_blank" rel="noopener">Docs</a>, Test location: <code>ethereumjs-testing</code> dependency</li>
+<li><a href="https://github.com/ethereum/py-evm" target="_blank" rel="noopener">Trinity</a> (Python): <a href="https://py-evm.readthedocs.io/en/latest/contributing.html#running-the-tests" target="_blank" rel="noopener">Docs</a>, Test location: <code>fixtures</code></li>
+<li><a href="https://github.com/PegaSysEng/pantheon" target="_blank" rel="noopener">Pantheon</a> (Java): <a href="https://github.com/PegaSysEng/pantheon/blob/master/docs/development/building.md#ethereum-reference-tests" target="_blank" rel="noopener">Docs</a>, Test Location: <code>ethereum/referencetests/src/test/resources</code></li>
+<li><a href="https://github.com/NethermindEth/nethermind" target="_blank" rel="noopener">Nethermind</a> (C#) <a href="https://nethermind.readthedocs.io" target="_blank" rel="noopener">Docs</a>, Test Location: <code>src/tests</code></li>
+</ul>
+<h2 id="using-the-tests">Using the Tests</h2>
+<p>We do <a href="https://github.com/ethereum/tests/releases" target="_blank" rel="noopener">versioned tag releases</a> for tests and you should aim to run your client libraries against the latest repository snapshot tagged.</p>
+<p>Generally the <a href="https://github.com/ethereum/tests/tree/develop" target="_blank" rel="noopener">develop</a> branch in <code>ethereum/tests</code> is always meant to be stable and you should be able to run your test against.</p>
+<h2 id="contribute-to-the-test-suite">Contribute to the Test Suite</h2>
+<p>See the dedicated <a href="https://ethereum-tests.readthedocs.io/en/latest/generating-tests.html" target="_blank" rel="noopener">section</a> in the docs on how to write new tests. Or <a href="https://github.com/ethereum/retesteth/wiki/Creating-a-State-Test-with-retesteth" target="_blank" rel="noopener">https://github.com/ethereum/retesteth/wiki/Creating-a-State-Test-with-retesteth</a></p>
+<p>If you want to follow up with current tasks and what is currently in the works, have a look at the <a href="https://github.com/ethereum/tests/issues" target="_blank" rel="noopener">issues</a></p>
+<p>Currently the C++ <code>Aleth</code> client is the reference client for generating tests. Have a look at <a href="https://github.com/ethereum/aleth/issues?q=is%3Aopen+is%3Aissue+label%3Atesteth" target="_blank" rel="noopener">issues</a> and <a href="https://github.com/ethereum/aleth/pulls?q=is%3Aopen+is%3Apr+label%3Atesteth" target="_blank" rel="noopener">PRs</a> tagged with <code>testeth</code> to get an idea what is currently being worked on regarding the test generation process.</p>
+<h2 id="contents-of-this-repository">Contents of this repository</h2>
+<p>Do not change test files in folders:</p>
+<ul>
+<li>StateTests</li>
+<li>BlockchainTests</li>
+<li>TransactionTests</li>
+<li>VMTests</li>
+</ul>
+<p>It is being created by the testFillers which could be found at src folder. The filler specification and wiki are in development so please ask on gitter channel for more details.</p>
+<p>If you want to modify a test filler or add a new test please contact @winsvega at <a href="https://gitter.im/ethereum/aleth" target="_blank" rel="noopener">https://gitter.im/ethereum/aleth</a>.
+Use the following guide: <a href="https://github.com/ethereum/retesteth/wiki/Creating-a-State-Test-with-retesteth" target="_blank" rel="noopener">https://github.com/ethereum/retesteth/wiki/Creating-a-State-Test-with-retesteth</a></p>
+</body></html></div>
+        </main>
+      </div>
+    </div>
+<footer class="app-footer text-md-left text-center">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-md-2 mb-md-0 mb-4">
+        <span class="pr-md-5 pr-0 py-3">
+          <a href="https://runtimeverification.com" target="_blank">
+            <picture>
+              <source
+                srcset="../../assets/img/rv-logo-dark.png"
+                media="(prefers-color-scheme: dark)"
+              />
+              <img
+                class="pr-3 footer-logo"
+                src="../../assets/img/rv-logo.png"
+                alt="Runtime Verification Inc logo"
+              />
+            </picture>
+          </a>
+        </span>
+      </div>
+      <div class="col-md-6 mb-md-0 mb-4"></div>
+      <div class="col-md-4 text-md-right">
+        <p class="copyright">
+          &copy; 2020 Runtime Verification Inc. All right reserved.
+        </p>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script
+  async
+  src="https://www.googletagmanager.com/gtag/js?id=UA-163311512-1"
+></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag() {
+    dataLayer.push(arguments);
+  }
+  gtag("js", new Date());
+  gtag("config", "UA-163311512-1");
+</script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Typist/1.2/typist.min.js"></script>
+    <script src="../../assets/js/index.js"></script>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=G-QL0D8HRYFW"
+    ></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+      gtag("config", "G-QL0D8HRYFW");
+    </script>
+  </body>
+</html>

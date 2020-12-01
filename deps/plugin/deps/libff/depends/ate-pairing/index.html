@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+<meta charset="utf-8" />
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1.0, maximum-scale=1.0"
+/>
+<meta
+  name="description"
+  content="K Semantics of the Ethereum Virtual Machine (EVM)"
+/>
+<meta name="keywords" content="runtime, verification, rv, k" />
+<meta name="author" content="EVM Semantics | Runtime Verification Inc" />
+<meta name="robots" content="index, follow" />
+
+<!--favicon icon-->
+<link rel="icon" type="image/png" href="../../../../../../assets/img/favicon.ico" />
+
+<title>KEVM: Semantics of EVM in K | evm-semantics</title>
+
+<!-- <base href="/k/" /> -->
+
+<!--web fonts-->
+<link
+  href="https://fonts.googleapis.com/css?family=Nunito:300,400,600,700,800"
+  rel="stylesheet"
+/>
+<link
+  href="https://fonts.googleapis.com/css?family=Lora:400i"
+  rel="stylesheet"
+/>
+
+<link
+  href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.14.0/css/all.min.css"
+  rel="stylesheet"
+/>
+
+<link href="../../../../../../assets/css/index.css" rel="stylesheet" />
+
+<!--[if (gt IE 9) |!(IE)]><!-->
+<!--<link rel="stylesheet" href="/assets/vendor/custom-nav/css/effects/fade-menu.css"/>-->
+<!-- <link rel="stylesheet" href="../../../../../../assets/k/vl-nav/css/effects/slide-menu.css" /> -->
+<!--<![endif]-->
+
+  </head>
+
+  <body>
+<header
+  class="navbar navbar-expand navbar-dark flex-column flex-md-row bd-navbar"
+>
+  <a class="logo-link" href="../../../../../../index.html"> EVM Semantics </a>
+  <ul class="navbar-nav ml-md-auto">
+    <li class="nav-item">
+      <a
+        class="nav-link pl-2 pr-1 mx-1 py-3 my-n2"
+        href="https://github.com/kframework/evm-semantics"
+        target="_blank"
+        rel="noopener"
+        aria-label="GitHub"
+      >
+        <i class="fab fa-github"></i>
+      </a>
+    </li>
+  </ul>
+  <!--
+  <a
+    class="btn btn-rv-blue d-none d-lg-inline-block mb-3 mb-md-0 ml-md-3"
+    href="../../../../../../downloads"
+    >Download</a
+  >
+  -->
+</header>
+
+
+    <div class="container-fluid">
+      <div class="row flex-xl-nowrap">
+<div class="col-12 col-md-3 col-xl-2 bd-sidebar mb-3">
+  <form
+    role="search"
+    class="bd-search d-flex align-items-center justify-content-between"
+  >
+    <input
+      type="search"
+      class="form-control"
+      placeholder="Search..."
+      aria-label="Search for..."
+      autocomplete="false"
+      id="search-box"
+    />
+    <button
+      class="btn bd-search-docs-toggle d-md-none p-0 ml-3 collapsed"
+      type="button"
+      aria-label="Toggle docs navigation"
+      style="font-size: 1.4rem"
+    >
+      <i class="fas fa-bars"></i>
+    </button>
+  </form>
+  <nav class="collapse bd-links" aria-label="Main navigation">
+    <div class="bd-toc-item">
+      <a class="bd-toc-link" href="../../../../../../">Homepage</a>
+      <a class="bd-toc-link" href="../../../../../../INSTALL">Install</a>
+    </div>
+  </nav>
+</div>
+
+        <main
+          class="col-12 col-md-9 col-xl-8 py-md-3 pl-md-5 bd-content"
+          role="main"
+        >
+          <div class="markdown-preview"><html><head></head><body><h1 id="high-speed-software-implementation-of-the-optimal-ate-pairing-over-barreto-naehrig-curves">High-Speed Software Implementation of the Optimal Ate Pairing over Barreto-Naehrig Curves</h1>
+<p>This library provides functionality to compute the optimal ate pairing over Barreto-Naehrig (BN) curves.
+It is released under the <a href="http://opensource.org/licenses/BSD-3-Clause" target="_blank" rel="noopener">BSD 3-Clause License</a>.</p>
+<p>Now I&apos;m developing a new pairing library <a href="https://github.com/herumi/mcl/" target="_blank" rel="noopener">mcl</a>, which is more portable and supports larger primes than this library though it is a little slower.</p>
+<h2 id="history">History</h2>
+<ul>
+<li>2015/May/15: add <a href="java/java/">java api</a></li>
+<li>2014/Jun/15: support a BN curve for SNARKs, incorporating code from <a href="https://github.com/scipr-lab/libsnark" target="_blank" rel="noopener">libsnark</a></li>
+<li>2013/Jun/02: support <code>mulx</code> on <a href="http://en.wikipedia.org/wiki/Haswell_%28microarchitecture%29" target="_blank" rel="noopener">Haswell</a></li>
+<li>2013/Mar/08: add elliptic curve class</li>
+<li>2012/Jan/30: rewrite ate pairing according to <a href="http://www.patricklonga.bravehost.com/speed_pairing.html" target="_blank" rel="noopener">Faster explicit formulas for computing pairings over ordinary curves</a></li>
+<li>2010/Sep/8: change twist xi from u + 12 to u</li>
+<li>2010/Jul/15: use cyclotomic squaring for final exponentiation</li>
+<li>2010/Jun/18: first release</li>
+</ul>
+<h2 id="overview">Overview</h2>
+<p>The following two BN curves are supported:</p>
+<ol>
+<li>a BN curve over the 254-bit prime p = 36z^4 + 36z^3 + 24z^2 + 6z + 1 where z = -(2^62 + 2^55 + 1); and</li>
+<li>a BN curve over a 254-bit prime p such that n := p + 1 - t has high 2-adicity.</li>
+</ol>
+<p>By default, the first curve (we call it as CurveFp254BNb) is used; when setting the flag <code>SUPPORT_SNARK</code>, the second curve (we call it as CurveSNARK) is used instead.</p>
+<ul>
+<li>
+<p><strong>CurveFp254BNb</strong>
+The value of z is found by <a href="http://dx.doi.org/10.1007/978-3-540-85538-5_13" target="_blank" rel="noopener">[NASKM]</a> first.
+The curve instantiated by z is investigated by <a href="http://eprint.iacr.org/2010/429" target="_blank" rel="noopener">[PSNB]</a> for an efficient implementation.
+Our library implements a fast algorithm, which is proposed by <a href="http://eprint.iacr.org/2010/526" target="_blank" rel="noopener">[AKLGL]</a> for this curve.
+The performance of this library is competitive to the state-of-the-art implementation report in <a href="http://sac2013.irmacs.sfu.ca/slides/s1.pdf" target="_blank" rel="noopener">[ABLR]</a>.</p>
+</li>
+<li>
+<p><strong>CurveSNARK</strong>
+Support for the second curve builds on code provided by <a href="http://www.scipr-lab.org/" target="_blank" rel="noopener">SCIPR Lab</a> in <a href="https://github.com/scipr-lab/libsnark" target="_blank" rel="noopener">libsnark</a>. The curve was specifically selected for speeding up <strong>Succinct Non-interactive ARguments of Knowledge</strong> (SNARKs), which benefit from its high 2-adicity (see <a href="http://eprint.iacr.org/2013/507" target="_blank" rel="noopener">[BCGTV13]</a> and <a href="http://eprint.iacr.org/2013/879" target="_blank" rel="noopener">[BCTV14]</a>).</p>
+</li>
+</ul>
+<p>Pairing computations on the first curve are more efficient, and the performance numbers reported below (and in our papers) are achieved using this curve (which is prefered for applications that do not benefit from high 2-adicity).
+Note that the old parameters in [BDMOHT] are not used now.</p>
+<h2 id="parameters">Parameters</h2>
+<p>The curve equation for a BN curve is:</p>
+<pre><code>E/Fp: y^2 = x^3 + b .
+</code></pre>
+<p>The two supported BN curves have the following parameters:</p>
+<ol>
+<li>b = 2 and p = 16798108731015832284940804142231733909889187121439069848933715426072753864723; and</li>
+<li>b = 3 and p = 21888242871839275222246405745257275088696311157297823662689037894645226208583.</li>
+</ol>
+<p>As usual,</p>
+<ul>
+<li>the cyclic group G1 (aka Ec1) is instantiated as E(Fp)[n] where n := p + 1 - t;</li>
+<li>the cyclic group G2 (aka Ec2) is instantiated as the inverse image of E&apos;(Fp^2)[n] under a twisting isomorphism from E&apos; to E; and</li>
+<li>the pairing e: G1 x G2 -&gt; Fp12 is the optimal ate pairing.</li>
+</ul>
+<p>The field Fp12 is constructed via the following tower:</p>
+<ul>
+<li>Fp2 = Fp[u] / (u^2 + 1)</li>
+<li>Fp6 = Fp2[v] / (v^3 - Xi) where Xi = u + 1</li>
+<li>Fp12 = Fp6[w] / (w^2 - v)</li>
+</ul>
+<h2 id="requirements">Requirements</h2>
+<ul>
+<li>OS: 64-bit Windows; 64-bit Linux; Mac OS X</li>
+<li>CPU: x64 Intel; AMD processor</li>
+<li>C++ compiler: Visual Studio 2012; gcc 4.4.1 or later</li>
+</ul>
+<h2 id="build-instructions">Build instructions</h2>
+<h3 id="windows">Windows</h3>
+<pre><code>&gt; git clone git://github.com/herumi/xbyak.git
+&gt; git clone git://github.com/herumi/ate-pairing.git
+&gt; git clone git://github.com/herumi/cybozulib-ext.git ; compiled binary of mpir
+</code></pre>
+<p>Open <code>ate/ate.sln</code> and compile <code>test_bn</code> with Release mode. The produced binary is <code>ate/x64/Release/test_bn.exe</code>.</p>
+<h3 id="cygwin">Cygwin</h3>
+<p>Install <code>mingw64-x86_64-gcc-g++</code> (run Cygwin setup and search <code>mingw64</code>). Then use the following commands:</p>
+<pre><code>PATH=/usr/x86_64-w64-mingw32/sys-root/mingw/bin/:$PATH
+make -j
+test/bn.exe
+</code></pre>
+<p>Note that <code>test/bn.exe</code> uses <code>mulx</code> if possible; if you do not want to use it, run the executable as <code>test/bn.exe -mulx 0</code>. (This allows you to verify the difference with/without mulx on Haswell.)</p>
+<h3 id="linux">Linux</h3>
+<p>Use the following commands:</p>
+<pre><code>$ git clone git://github.com/herumi/xbyak.git
+$ git clone git://github.com/herumi/ate-pairing.git
+$ cd ate-pairing
+$ make -j
+$ test/bn
+</code></pre>
+<p>The library <a href="https://github.com/herumi/xbyak" target="_blank" rel="noopener">xbyak</a> is a x86/x86-64 JIT assembler for C++, developed for efficient pairing implementations. (See also <a href="http://homepage1.nifty.com/herumi/soft/xbyak_e.html" target="_blank" rel="noopener">this webpage</a>.) Note that binaries other than <code>test/bn</code> are used for testing purposes only.</p>
+<ul>
+<li>This implementation uses dynamically-generated code, so you will get the error
+<code>zmInit ERR:can&apos;t protect</code> if execution of code on the heap is disallowed by
+some modern systems.
+For example, on Fedora 20, run <code>sudo setsebool -P allow_execheap 1</code> to allow execution to solve this.</li>
+</ul>
+<p>By the default, the first BN curve is used. If instead you want to use the second BN curve (specialized to SNARKs), modify the fourth line above to:</p>
+<pre><code>$ make -j SUPPORT_SNARK=1
+</code></pre>
+<ul>
+<li>REMARK. You <em>defined</em> <code>BN_SUPPORT_SNARK</code> macro for a compile when if you use a library(libzm.a) made by <code>SUPPORT_SNARK=1</code>.</li>
+</ul>
+<h2 id="usage">Usage</h2>
+<p>See the function <code>sample2()</code> in <a href="https://github.com/herumi/ate-pairing/blob/master/test/sample.cpp" target="_blank" rel="noopener">sample.cpp</a>. Also, use can use <code>mpz_class</code> for scalar multiplication of points on the elliptic curves,
+if <code>MIE_ATE_USE_GMP</code> is defined. For instance:</p>
+<pre><code>using namespace bn;
+Param::init();
+const Ec2 g2(...);
+const Ec1 g1(...);
+mpz_class a(&quot;123456789&quot;);
+mpz_class b(&quot;98765432&quot;);
+Ec1 g1a = g1 * a;
+Ec2 g2b = g2 * b;
+Fp12 e;
+opt_atePairing(e, g2b, g1a);
+</code></pre>
+<h2 id="usage-for-java">Usage for Java</h2>
+<p>See <a href="java/java/">java.md</a>.
+A sample code is <a href="https://github.com/kframework/evm-semantics/tree/master/java/BN254Test.java">BN254Test.java</a>.</p>
+<h2 id="operation-costs">Operation costs</h2>
+<p>Let mu be the cost of <em>unreduced multiplication</em> producing double-precision result (i.e., 256-bit int x 256-bit int to 512-bit int); and let r be the cost of <em>modular reduction</em> of double-precision integers (i.e., 512-bit int to 256-bit int in Fp). Then, for us,</p>
+<ul>
+<li>Fp::mul = mu + r</li>
+<li>Fp2::mul = 3mu + 2r</li>
+<li>Fp2::square = 2mu + 2r</li>
+</ul>
+<p>Next, we compare the costs of our library with the one of <a href="http://eprint.iacr.org/2010/526" target="_blank" rel="noopener">[AKLGL10]</a>:</p>
+<table>
+<thead>
+<tr>
+<th>Phase</th>
+<th>[AKLGL10]</th>
+<th>This work</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Miller loop</td>
+<td>6792mu + 3022r</td>
+<td>6785mu + 3022r</td>
+</tr>
+<tr>
+<td>Final exponentiation</td>
+<td>3753mu + 2006r</td>
+<td>3526mu + 1932r</td>
+</tr>
+<tr>
+<td>Optimal ate pairing</td>
+<td>10545mu + 5028r</td>
+<td>10311mu + 4954r</td>
+</tr>
+</tbody>
+</table>
+<p>Note: <a href="http://eprint.iacr.org/2010/526" target="_blank" rel="noopener">[Table 2 in p. 17, AKLGL10]</a> does not contain the cost of (m, r) so we have added the costs of (282m + 6mu + 4r) and (30m + 75mu + 50r) to ML and FE respectively.</p>
+<p>Finally, at the moment, our implementation does not support the algorithm in <a href="https://eprint.iacr.org/2010/429" target="_blank" rel="noopener">PSNB10</a>.</p>
+<h2 id="benchmark">Benchmark</h2>
+<p>The cost of a pairing is <strong>1.17M</strong> clock cycles on Core i7 4700MQ (Haswell) 2.4GHz processor with TurboBoost disabled. Below, we also include clock cycle counts on Core i7 2600 3.4GHz, Xeon X5650 2.6GHz, and Core i7 4700MQ 2.4GHz.
+The formal benchmark is written in [ZPMRTH].</p>
+<pre><code>% sudo sh -c &quot;echo 0 &gt; /sys/devices/system/cpu/cpufreq/boost&quot;
+% cat /sys/devices/system/cpu/cpufreq/boost
+0
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>operation</th>
+<th>i7 2600</th>
+<th>Xeon X5650</th>
+<th>Haswell</th>
+<th>Haswell with mulx</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>TurboBoost</td>
+<td>on</td>
+<td>on</td>
+<td>off</td>
+<td>off</td>
+</tr>
+</tbody>
+</table>
+<pre><code>        |        |          |       |
+</code></pre>
+<p>mu          | 50     |60        |42     |38
+r           | 80     |98        |69     |65
+Fp:mul      |124     |146       |98     |90
+Fp2:mul     |360     |412       |       |
+Fp2:square  |288     |335       |       |
+|        |          |       |
+G1::double  |1150    |1300      |       |
+G1::add     |2200    |2600      |       |
+G2::double  |2500    |2900      |       |
+G2::add     |5650    |6500      |       |
+Fp12::square|4500    |5150      |       |
+Fp12::mul   |6150    |7000      |       |
+|        |          |       |
+Miller loop |0.83M   |0.97M     |0.82M  |0.71M
+final_exp   |0.53M   |0.63M     |0.51M  |0.46M
+|        |          |       |
+pairing     |1.36M   |1.60M     |1.33M  |1.17M</p>
+<h2 id="references">References</h2>
+<ul>
+<li>
+<p>[ABLR] <a href="http://dx.doi.org/10.1007/978-3-662-43414-7_1" target="_blank" rel="noopener"><em>The Realm of the Pairings</em></a> (Invited Talk),
+Diego F. Aranha, Paulo S. L. M. Barreto, Patrick Longa, and Jefferson E. Ricardini,
+SAC 2013, (<a href="http://eprint.iacr.org/2013/722" target="_blank" rel="noopener">preprint</a>, <a href="http://sac2013.irmacs.sfu.ca/slides/s1.pdf" target="_blank" rel="noopener">slide</a>)</p>
+</li>
+<li>
+<p>[NASKM] <a href="http://dx.doi.org/10.1007/978-3-540-85538-5_13" target="_blank" rel="noopener"><em>Integer Variable chi-Based Ate Pairing</em></a>, Y. Nogami, M. Akane, Y. Sakemi, H. Kato, and Y. Morikawa,
+Pairing 2008</p>
+</li>
+<li>
+<p>[PSNB] <a href="http://dx.doi.org/10.1016/j.jss.2011.03.083" target="_blank" rel="noopener"><em>A Family of Implementation-Friendly BN Elliptic Curves</em></a>,
+G.C.C.F. Pereira, M.A. Simplicio Jr, M. Naehrig, P.S.L.M. Barreto, J. Systems and Software 2011, (<a href="http://eprint.iacr.org/2010/429" target="_blank" rel="noopener">preprint</a>)</p>
+</li>
+<li>
+<p>[AKLGL] <a href="http://dx.doi.org/10.1007/978-3-642-20465-4_5" target="_blank" rel="noopener"><em>Faster Explicit Formulas for Computing Pairings over Ordinary Curves</em></a>,
+D.F. Aranha, K. Karabina, P. Longa, C.H. Gebotys, J. Lopez,
+EUROCRYPTO 2011, (<a href="http://eprint.iacr.org/2010/526" target="_blank" rel="noopener">preprint</a>)</p>
+</li>
+<li>
+<p>[BDMOHT] <a href="http://dx.doi.org/10.1007/978-3-642-17455-1_2" target="_blank" rel="noopener"><em>High-Speed Software Implementation of the Optimal Ate Pairing over Barreto-Naehrig Curves</em></a>,
+Jean-Luc Beuchat, Jorge Enrique Gonz&#xE1;lez D&#xED;az, Shigeo Mitsunari, Eiji Okamoto, Francisco Rodr&#xED;guez-Henr&#xED;quez, Tadanori Teruya,
+Pairing 2010, (<a href="http://eprint.iacr.org/2010/354" target="_blank" rel="noopener">preprint</a>)</p>
+</li>
+<li>
+<p><a href="http://eprint.iacr.org/2013/362" target="_blank" rel="noopener"><em>A Fast Implementation of the Optimal Ate Pairing over BN curve on Intel Haswell Processor</em></a>,
+Shigeo Mitsunari,
+IACR ePrint 2013/362</p>
+</li>
+<li>
+<p><a href="http://eprint.iacr.org/2013/879" target="_blank" rel="noopener"><em>Succinct Non-Interactive Zero Knowledge for a von Neumann Architecture</em></a>,
+Eli Ben-Sasson, Alessandro Chiesa, Eran Tromer, Madars Virza,
+USENIX Security 2014</p>
+</li>
+<li>
+<p>[ZPMRTH] <a href="http://dx.doi.org/10.1109/TC.2014.2329681" target="_blank" rel="noopener"><em>Software implementation of an Attribute-Based Encryption scheme</em></a>,
+Eric Zavattoni and Luis J. Dominguez Perez and Shigeo Mitsunari and Ana H. Sanchez-Ramirez and Tadanori Teruya and Francisco Rodriguez-Henriquez,
+IEEE Transactions on Computers, To appear, (<a href="https://eprint.iacr.org/2014/401" target="_blank" rel="noopener">preprint</a>, <a href="http://sandia.cs.cinvestav.mx/index.php?n=Site.CPABE" target="_blank" rel="noopener">project Web page and source code</a>)</p>
+</li>
+<li>
+<p><a href="http://homepage1.nifty.com/herumi/crypt/ate-pairing.html" target="_blank" rel="noopener">This library&apos;s old webpage</a></p>
+</li>
+</ul>
+<h2 id="authors">Authors</h2>
+<ul>
+<li>MITSUNARI Shigeo (<code>herumi@nifty.com</code>)</li>
+<li>TERUYA Tadanori (<code>tadanori.teruya@gmail.com</code>)</li>
+</ul>
+<h2 id="contributors">Contributors</h2>
+<ul>
+<li>Alessandro Chiesa (<code>alexch@mit.edu</code>)</li>
+<li>Madars Virza (<code>madars@mit.edu</code>)</li>
+</ul>
+</body></html></div>
+        </main>
+      </div>
+    </div>
+<footer class="app-footer text-md-left text-center">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-md-2 mb-md-0 mb-4">
+        <span class="pr-md-5 pr-0 py-3">
+          <a href="https://runtimeverification.com" target="_blank">
+            <picture>
+              <source
+                srcset="../../../../../../assets/img/rv-logo-dark.png"
+                media="(prefers-color-scheme: dark)"
+              />
+              <img
+                class="pr-3 footer-logo"
+                src="../../../../../../assets/img/rv-logo.png"
+                alt="Runtime Verification Inc logo"
+              />
+            </picture>
+          </a>
+        </span>
+      </div>
+      <div class="col-md-6 mb-md-0 mb-4"></div>
+      <div class="col-md-4 text-md-right">
+        <p class="copyright">
+          &copy; 2020 Runtime Verification Inc. All right reserved.
+        </p>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script
+  async
+  src="https://www.googletagmanager.com/gtag/js?id=UA-163311512-1"
+></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag() {
+    dataLayer.push(arguments);
+  }
+  gtag("js", new Date());
+  gtag("config", "UA-163311512-1");
+</script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Typist/1.2/typist.min.js"></script>
+    <script src="../../../../../../assets/js/index.js"></script>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=G-QL0D8HRYFW"
+    ></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+      gtag("config", "G-QL0D8HRYFW");
+    </script>
+  </body>
+</html>

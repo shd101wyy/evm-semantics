@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+<meta charset="utf-8" />
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1.0, maximum-scale=1.0"
+/>
+<meta
+  name="description"
+  content="K Semantics of the Ethereum Virtual Machine (EVM)"
+/>
+<meta name="keywords" content="runtime, verification, rv, k" />
+<meta name="author" content="EVM Semantics | Runtime Verification Inc" />
+<meta name="robots" content="index, follow" />
+
+<!--favicon icon-->
+<link rel="icon" type="image/png" href="../../../../assets/img/favicon.ico" />
+
+<title>KEVM: Semantics of EVM in K | evm-semantics</title>
+
+<!-- <base href="/k/" /> -->
+
+<!--web fonts-->
+<link
+  href="https://fonts.googleapis.com/css?family=Nunito:300,400,600,700,800"
+  rel="stylesheet"
+/>
+<link
+  href="https://fonts.googleapis.com/css?family=Lora:400i"
+  rel="stylesheet"
+/>
+
+<link
+  href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.14.0/css/all.min.css"
+  rel="stylesheet"
+/>
+
+<link href="../../../../assets/css/index.css" rel="stylesheet" />
+
+<!--[if (gt IE 9) |!(IE)]><!-->
+<!--<link rel="stylesheet" href="/assets/vendor/custom-nav/css/effects/fade-menu.css"/>-->
+<!-- <link rel="stylesheet" href="../../../../assets/k/vl-nav/css/effects/slide-menu.css" /> -->
+<!--<![endif]-->
+
+  </head>
+
+  <body>
+<header
+  class="navbar navbar-expand navbar-dark flex-column flex-md-row bd-navbar"
+>
+  <a class="logo-link" href="../../../../index.html"> EVM Semantics </a>
+  <ul class="navbar-nav ml-md-auto">
+    <li class="nav-item">
+      <a
+        class="nav-link pl-2 pr-1 mx-1 py-3 my-n2"
+        href="https://github.com/kframework/evm-semantics"
+        target="_blank"
+        rel="noopener"
+        aria-label="GitHub"
+      >
+        <i class="fab fa-github"></i>
+      </a>
+    </li>
+  </ul>
+  <!--
+  <a
+    class="btn btn-rv-blue d-none d-lg-inline-block mb-3 mb-md-0 ml-md-3"
+    href="../../../../downloads"
+    >Download</a
+  >
+  -->
+</header>
+
+
+    <div class="container-fluid">
+      <div class="row flex-xl-nowrap">
+<div class="col-12 col-md-3 col-xl-2 bd-sidebar mb-3">
+  <form
+    role="search"
+    class="bd-search d-flex align-items-center justify-content-between"
+  >
+    <input
+      type="search"
+      class="form-control"
+      placeholder="Search..."
+      aria-label="Search for..."
+      autocomplete="false"
+      id="search-box"
+    />
+    <button
+      class="btn bd-search-docs-toggle d-md-none p-0 ml-3 collapsed"
+      type="button"
+      aria-label="Toggle docs navigation"
+      style="font-size: 1.4rem"
+    >
+      <i class="fas fa-bars"></i>
+    </button>
+  </form>
+  <nav class="collapse bd-links" aria-label="Main navigation">
+    <div class="bd-toc-item">
+      <a class="bd-toc-link" href="../../../../">Homepage</a>
+      <a class="bd-toc-link" href="../../../../INSTALL">Install</a>
+    </div>
+  </nav>
+</div>
+
+        <main
+          class="col-12 col-md-9 col-xl-8 py-md-3 pl-md-5 bd-content"
+          role="main"
+        >
+          <div class="markdown-preview"><html><head></head><body><h1 id="cpp-httplib">cpp-httplib</h1>
+<p><a href="https://github.com/yhirose/cpp-httplib/actions" target="_blank" rel="noopener"><img src="https://github.com/yhirose/cpp-httplib/workflows/test/badge.svg" alt></a>
+<a href="https://ci.appveyor.com/project/yhirose/cpp-httplib" target="_blank" rel="noopener"><img src="https://ci.appveyor.com/api/projects/status/github/yhirose/cpp-httplib?branch=master&amp;svg=true" alt="Bulid Status"></a></p>
+<p>A C++11 single-file header-only cross platform HTTP/HTTPS library.</p>
+<p>It&apos;s extremely easy to setup. Just include <strong>httplib.h</strong> file in your code!</p>
+<p>For Windows users: Please read <a href="https://github.com/yhirose/cpp-httplib#windows" target="_blank" rel="noopener">this note</a>.</p>
+<h2 id="server-example">Server Example</h2>
+<pre class="language-text"><code>#include &lt;httplib.h&gt;
+
+int main(void)
+{
+  using namespace httplib;
+
+  Server svr;
+
+  svr.Get(&quot;/hi&quot;, [](const Request&amp; req, Response&amp; res) {
+    res.set_content(&quot;Hello World!&quot;, &quot;text/plain&quot;);
+  });
+
+  svr.Get(R&quot;(/numbers/(\d+))&quot;, [&amp;](const Request&amp; req, Response&amp; res) {
+    auto numbers = req.matches[1];
+    res.set_content(numbers, &quot;text/plain&quot;);
+  });
+
+  svr.Get(&quot;/body-header-param&quot;, [](const Request&amp; req, Response&amp; res) {
+    if (req.has_header(&quot;Content-Length&quot;)) {
+      auto val = req.get_header_value(&quot;Content-Length&quot;);
+    }
+    if (req.has_param(&quot;key&quot;)) {
+      auto val = req.get_param_value(&quot;key&quot;);
+    }
+    res.set_content(req.body, &quot;text/plain&quot;);
+  });
+
+  svr.Get(&quot;/stop&quot;, [&amp;](const Request&amp; req, Response&amp; res) {
+    svr.stop();
+  });
+
+  svr.listen(&quot;localhost&quot;, 1234);
+}
+</code></pre>
+<p><code>Post</code>, <code>Put</code>, <code>Delete</code> and <code>Options</code> methods are also supported.</p>
+<h3 id="bind-a-socket-to-multiple-interfaces-and-any-available-port">Bind a socket to multiple interfaces and any available port</h3>
+<pre class="language-cpp"><code><span class="token keyword">int</span> port <span class="token operator">=</span> svr<span class="token punctuation">.</span><span class="token function">bind_to_any_port</span><span class="token punctuation">(</span><span class="token string">&quot;0.0.0.0&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+svr<span class="token punctuation">.</span><span class="token function">listen_after_bind</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<h3 id="static-file-server">Static File Server</h3>
+<pre class="language-cpp"><code><span class="token comment">// Mount / to ./www directory</span>
+<span class="token keyword">auto</span> ret <span class="token operator">=</span> svr<span class="token punctuation">.</span><span class="token function">set_mount_point</span><span class="token punctuation">(</span><span class="token string">&quot;/&quot;</span><span class="token punctuation">,</span> <span class="token string">&quot;./www&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>ret<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token comment">// The specified base directory doesn&apos;t exist...</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment">// Mount /public to ./www directory</span>
+ret <span class="token operator">=</span> svr<span class="token punctuation">.</span><span class="token function">set_mount_point</span><span class="token punctuation">(</span><span class="token string">&quot;/public&quot;</span><span class="token punctuation">,</span> <span class="token string">&quot;./www&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// Mount /public to ./www1 and ./www2 directories</span>
+ret <span class="token operator">=</span> svr<span class="token punctuation">.</span><span class="token function">set_mount_point</span><span class="token punctuation">(</span><span class="token string">&quot;/public&quot;</span><span class="token punctuation">,</span> <span class="token string">&quot;./www1&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// 1st order to search</span>
+ret <span class="token operator">=</span> svr<span class="token punctuation">.</span><span class="token function">set_mount_point</span><span class="token punctuation">(</span><span class="token string">&quot;/public&quot;</span><span class="token punctuation">,</span> <span class="token string">&quot;./www2&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// 2nd order to search</span>
+
+<span class="token comment">// Remove mount /</span>
+ret <span class="token operator">=</span> svr<span class="token punctuation">.</span><span class="token function">remove_mount_point</span><span class="token punctuation">(</span><span class="token string">&quot;/&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// Remove mount /public</span>
+ret <span class="token operator">=</span> svr<span class="token punctuation">.</span><span class="token function">remove_mount_point</span><span class="token punctuation">(</span><span class="token string">&quot;/public&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<pre class="language-cpp"><code><span class="token comment">// User defined file extension and MIME type mappings</span>
+svr<span class="token punctuation">.</span><span class="token function">set_file_extension_and_mimetype_mapping</span><span class="token punctuation">(</span><span class="token string">&quot;cc&quot;</span><span class="token punctuation">,</span> <span class="token string">&quot;text/x-c&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+svr<span class="token punctuation">.</span><span class="token function">set_file_extension_and_mimetype_mapping</span><span class="token punctuation">(</span><span class="token string">&quot;cpp&quot;</span><span class="token punctuation">,</span> <span class="token string">&quot;text/x-c&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+svr<span class="token punctuation">.</span><span class="token function">set_file_extension_and_mimetype_mapping</span><span class="token punctuation">(</span><span class="token string">&quot;hh&quot;</span><span class="token punctuation">,</span> <span class="token string">&quot;text/x-h&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p>The followings are built-in mappings:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Extension</th>
+<th style="text-align:left">MIME Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">txt</td>
+<td style="text-align:left">text/plain</td>
+</tr>
+<tr>
+<td style="text-align:left">html, htm</td>
+<td style="text-align:left">text/html</td>
+</tr>
+<tr>
+<td style="text-align:left">css</td>
+<td style="text-align:left">text/css</td>
+</tr>
+<tr>
+<td style="text-align:left">jpeg, jpg</td>
+<td style="text-align:left">image/jpg</td>
+</tr>
+<tr>
+<td style="text-align:left">png</td>
+<td style="text-align:left">image/png</td>
+</tr>
+<tr>
+<td style="text-align:left">gif</td>
+<td style="text-align:left">image/gif</td>
+</tr>
+<tr>
+<td style="text-align:left">svg</td>
+<td style="text-align:left">image/svg+xml</td>
+</tr>
+<tr>
+<td style="text-align:left">ico</td>
+<td style="text-align:left">image/x-icon</td>
+</tr>
+<tr>
+<td style="text-align:left">json</td>
+<td style="text-align:left">application/json</td>
+</tr>
+<tr>
+<td style="text-align:left">pdf</td>
+<td style="text-align:left">application/pdf</td>
+</tr>
+<tr>
+<td style="text-align:left">js</td>
+<td style="text-align:left">application/javascript</td>
+</tr>
+<tr>
+<td style="text-align:left">wasm</td>
+<td style="text-align:left">application/wasm</td>
+</tr>
+<tr>
+<td style="text-align:left">xml</td>
+<td style="text-align:left">application/xml</td>
+</tr>
+<tr>
+<td style="text-align:left">xhtml</td>
+<td style="text-align:left">application/xhtml+xml</td>
+</tr>
+</tbody>
+</table>
+<p>NOTE: These the static file server methods are not thread safe.</p>
+<h3 id="logging">Logging</h3>
+<pre class="language-cpp"><code>svr<span class="token punctuation">.</span><span class="token function">set_logger</span><span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token keyword">const</span> <span class="token keyword">auto</span><span class="token operator">&amp;</span> req<span class="token punctuation">,</span> <span class="token keyword">const</span> <span class="token keyword">auto</span><span class="token operator">&amp;</span> res<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token function">your_logger</span><span class="token punctuation">(</span>req<span class="token punctuation">,</span> res<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<h3 id="error-handler">Error handler</h3>
+<pre class="language-cpp"><code>svr<span class="token punctuation">.</span><span class="token function">set_error_handler</span><span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token keyword">const</span> <span class="token keyword">auto</span><span class="token operator">&amp;</span> req<span class="token punctuation">,</span> <span class="token keyword">auto</span><span class="token operator">&amp;</span> res<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token keyword">auto</span> fmt <span class="token operator">=</span> <span class="token string">&quot;&lt;p&gt;Error Status: &lt;span style=&apos;color:red;&apos;&gt;%d&lt;/span&gt;&lt;/p&gt;&quot;</span><span class="token punctuation">;</span>
+  <span class="token keyword">char</span> buf<span class="token punctuation">[</span>BUFSIZ<span class="token punctuation">]</span><span class="token punctuation">;</span>
+  <span class="token function">snprintf</span><span class="token punctuation">(</span>buf<span class="token punctuation">,</span> <span class="token keyword">sizeof</span><span class="token punctuation">(</span>buf<span class="token punctuation">)</span><span class="token punctuation">,</span> fmt<span class="token punctuation">,</span> res<span class="token punctuation">.</span>status<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  res<span class="token punctuation">.</span><span class="token function">set_content</span><span class="token punctuation">(</span>buf<span class="token punctuation">,</span> <span class="token string">&quot;text/html&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<h3 id="&apos;multipart%2Fform-data&apos;-post-data">&apos;multipart/form-data&apos; POST data</h3>
+<pre class="language-cpp"><code>svr<span class="token punctuation">.</span><span class="token function">Post</span><span class="token punctuation">(</span><span class="token string">&quot;/multipart&quot;</span><span class="token punctuation">,</span> <span class="token punctuation">[</span><span class="token operator">&amp;</span><span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token keyword">const</span> <span class="token keyword">auto</span><span class="token operator">&amp;</span> req<span class="token punctuation">,</span> <span class="token keyword">auto</span><span class="token operator">&amp;</span> res<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token keyword">auto</span> size <span class="token operator">=</span> req<span class="token punctuation">.</span>files<span class="token punctuation">.</span><span class="token function">size</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">auto</span> ret <span class="token operator">=</span> req<span class="token punctuation">.</span><span class="token function">has_file</span><span class="token punctuation">(</span><span class="token string">&quot;name1&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">const</span> <span class="token keyword">auto</span><span class="token operator">&amp;</span> file <span class="token operator">=</span> req<span class="token punctuation">.</span><span class="token function">get_file_value</span><span class="token punctuation">(</span><span class="token string">&quot;name1&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token comment">// file.filename;</span>
+  <span class="token comment">// file.content_type;</span>
+  <span class="token comment">// file.content;</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<h3 id="receive-content-with-content-receiver">Receive content with Content receiver</h3>
+<pre class="language-cpp"><code>svr<span class="token punctuation">.</span><span class="token function">Post</span><span class="token punctuation">(</span><span class="token string">&quot;/content_receiver&quot;</span><span class="token punctuation">,</span>
+  <span class="token punctuation">[</span><span class="token operator">&amp;</span><span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token keyword">const</span> Request <span class="token operator">&amp;</span>req<span class="token punctuation">,</span> Response <span class="token operator">&amp;</span>res<span class="token punctuation">,</span> <span class="token keyword">const</span> ContentReader <span class="token operator">&amp;</span>content_reader<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>req<span class="token punctuation">.</span><span class="token function">is_multipart_form_data</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      MultipartFormDataItems files<span class="token punctuation">;</span>
+      <span class="token function">content_reader</span><span class="token punctuation">(</span>
+        <span class="token punctuation">[</span><span class="token operator">&amp;</span><span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token keyword">const</span> MultipartFormData <span class="token operator">&amp;</span>file<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+          files<span class="token punctuation">.</span><span class="token function">push_back</span><span class="token punctuation">(</span>file<span class="token punctuation">)</span><span class="token punctuation">;</span>
+          <span class="token keyword">return</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span><span class="token punctuation">,</span>
+        <span class="token punctuation">[</span><span class="token operator">&amp;</span><span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token keyword">const</span> <span class="token keyword">char</span> <span class="token operator">*</span>data<span class="token punctuation">,</span> size_t data_length<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+          files<span class="token punctuation">.</span><span class="token function">back</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>content<span class="token punctuation">.</span><span class="token function">append</span><span class="token punctuation">(</span>data<span class="token punctuation">,</span> data_length<span class="token punctuation">)</span><span class="token punctuation">;</span>
+          <span class="token keyword">return</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+      std<span class="token operator">::</span>string body<span class="token punctuation">;</span>
+      <span class="token function">content_reader</span><span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token operator">&amp;</span><span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token keyword">const</span> <span class="token keyword">char</span> <span class="token operator">*</span>data<span class="token punctuation">,</span> size_t data_length<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        body<span class="token punctuation">.</span><span class="token function">append</span><span class="token punctuation">(</span>data<span class="token punctuation">,</span> data_length<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+      <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+      res<span class="token punctuation">.</span><span class="token function">set_content</span><span class="token punctuation">(</span>body<span class="token punctuation">,</span> <span class="token string">&quot;text/plain&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<h3 id="send-content-with-content-provider">Send content with Content provider</h3>
+<pre class="language-cpp"><code><span class="token keyword">const</span> size_t DATA_CHUNK_SIZE <span class="token operator">=</span> <span class="token number">4</span><span class="token punctuation">;</span>
+
+svr<span class="token punctuation">.</span><span class="token function">Get</span><span class="token punctuation">(</span><span class="token string">&quot;/stream&quot;</span><span class="token punctuation">,</span> <span class="token punctuation">[</span><span class="token operator">&amp;</span><span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token keyword">const</span> Request <span class="token operator">&amp;</span>req<span class="token punctuation">,</span> Response <span class="token operator">&amp;</span>res<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token keyword">auto</span> data <span class="token operator">=</span> <span class="token keyword">new</span> std<span class="token operator">::</span><span class="token function">string</span><span class="token punctuation">(</span><span class="token string">&quot;abcdefg&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+  res<span class="token punctuation">.</span><span class="token function">set_content_provider</span><span class="token punctuation">(</span>
+    data<span class="token operator">-&gt;</span><span class="token function">size</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token comment">// Content length</span>
+    <span class="token punctuation">[</span>data<span class="token punctuation">]</span><span class="token punctuation">(</span>size_t offset<span class="token punctuation">,</span> size_t length<span class="token punctuation">,</span> DataSink <span class="token operator">&amp;</span>sink<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token keyword">const</span> <span class="token keyword">auto</span> <span class="token operator">&amp;</span>d <span class="token operator">=</span> <span class="token operator">*</span>data<span class="token punctuation">;</span>
+      sink<span class="token punctuation">.</span><span class="token function">write</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>d<span class="token punctuation">[</span>offset<span class="token punctuation">]</span><span class="token punctuation">,</span> std<span class="token operator">::</span><span class="token function">min</span><span class="token punctuation">(</span>length<span class="token punctuation">,</span> DATA_CHUNK_SIZE<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token keyword">return</span> <span class="token boolean">true</span><span class="token punctuation">;</span> <span class="token comment">// return &apos;false&apos; if you want to cancel the process.</span>
+    <span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token punctuation">[</span>data<span class="token punctuation">]</span> <span class="token punctuation">{</span> <span class="token keyword">delete</span> data<span class="token punctuation">;</span> <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<h3 id="chunked-transfer-encoding">Chunked transfer encoding</h3>
+<pre class="language-cpp"><code>svr<span class="token punctuation">.</span><span class="token function">Get</span><span class="token punctuation">(</span><span class="token string">&quot;/chunked&quot;</span><span class="token punctuation">,</span> <span class="token punctuation">[</span><span class="token operator">&amp;</span><span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token keyword">const</span> Request<span class="token operator">&amp;</span> req<span class="token punctuation">,</span> Response<span class="token operator">&amp;</span> res<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  res<span class="token punctuation">.</span><span class="token function">set_chunked_content_provider</span><span class="token punctuation">(</span>
+    <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">(</span>size_t offset<span class="token punctuation">,</span> DataSink <span class="token operator">&amp;</span>sink<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      sink<span class="token punctuation">.</span><span class="token function">write</span><span class="token punctuation">(</span><span class="token string">&quot;123&quot;</span><span class="token punctuation">,</span> <span class="token number">3</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+      sink<span class="token punctuation">.</span><span class="token function">write</span><span class="token punctuation">(</span><span class="token string">&quot;345&quot;</span><span class="token punctuation">,</span> <span class="token number">3</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+      sink<span class="token punctuation">.</span><span class="token function">write</span><span class="token punctuation">(</span><span class="token string">&quot;789&quot;</span><span class="token punctuation">,</span> <span class="token number">3</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+      sink<span class="token punctuation">.</span><span class="token function">done</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token keyword">return</span> <span class="token boolean">true</span><span class="token punctuation">;</span> <span class="token comment">// return &apos;false&apos; if you want to cancel the process.</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<h3 id="&apos;expect%3A-100-continue&apos;-handler">&apos;Expect: 100-continue&apos; handler</h3>
+<p>As default, the server sends <code>100 Continue</code> response for <code>Expect: 100-continue</code> header.</p>
+<pre class="language-cpp"><code><span class="token comment">// Send a &apos;417 Expectation Failed&apos; response.</span>
+svr<span class="token punctuation">.</span><span class="token function">set_expect_100_continue_handler</span><span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token keyword">const</span> Request <span class="token operator">&amp;</span>req<span class="token punctuation">,</span> Response <span class="token operator">&amp;</span>res<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token keyword">return</span> <span class="token number">417</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<pre class="language-cpp"><code><span class="token comment">// Send a final status without reading the message body.</span>
+svr<span class="token punctuation">.</span><span class="token function">set_expect_100_continue_handler</span><span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token keyword">const</span> Request <span class="token operator">&amp;</span>req<span class="token punctuation">,</span> Response <span class="token operator">&amp;</span>res<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token keyword">return</span> res<span class="token punctuation">.</span>status <span class="token operator">=</span> <span class="token number">401</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<h3 id="keep-alive-connection">Keep-Alive connection</h3>
+<pre class="language-cpp"><code>svr<span class="token punctuation">.</span><span class="token function">set_keep_alive_max_count</span><span class="token punctuation">(</span><span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// Default is 5</span>
+</code></pre>
+<h3 id="timeout">Timeout</h3>
+<pre class="language-text"><code>svr.set_read_timeout(5, 0); // 5 seconds
+svr.set_write_timeout(5, 0); // 5 seconds
+svr.set_idle_interval(0, 100000); // 100 milliseconds
+</code></pre>
+<h3 id="set-maximum-payload-length-for-reading-request-body">Set maximum payload length for reading request body</h3>
+<pre class="language-text"><code>svr.set_payload_max_length(1024 * 1024 * 512); // 512MB
+</code></pre>
+<h3 id="server-sent-events">Server-Sent Events</h3>
+<p>Please check <a href="https://github.com/yhirose/cpp-httplib/blob/master/example/sse.cc" target="_blank" rel="noopener">here</a>.</p>
+<h3 id="default-thread-pool-support">Default thread pool support</h3>
+<p><code>ThreadPool</code> is used as a default task queue, and the default thread count is set to value from <code>std::thread::hardware_concurrency()</code>.</p>
+<p>You can change the thread count by setting <code>CPPHTTPLIB_THREAD_POOL_COUNT</code>.</p>
+<h3 id="override-the-default-thread-pool-with-yours">Override the default thread pool with yours</h3>
+<pre class="language-cpp"><code><span class="token keyword">class</span> <span class="token class-name">YourThreadPoolTaskQueue</span> <span class="token operator">:</span> <span class="token base-clause"><span class="token keyword">public</span> <span class="token class-name">TaskQueue</span></span> <span class="token punctuation">{</span>
+<span class="token keyword">public</span><span class="token operator">:</span>
+  <span class="token function">YourThreadPoolTaskQueue</span><span class="token punctuation">(</span>size_t n<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    pool_<span class="token punctuation">.</span><span class="token function">start_with_thread_count</span><span class="token punctuation">(</span>n<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+
+  <span class="token keyword">virtual</span> <span class="token keyword">void</span> <span class="token function">enqueue</span><span class="token punctuation">(</span>std<span class="token operator">::</span>function<span class="token operator">&lt;</span><span class="token keyword">void</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">&gt;</span> fn<span class="token punctuation">)</span> override <span class="token punctuation">{</span>
+    pool_<span class="token punctuation">.</span><span class="token function">enqueue</span><span class="token punctuation">(</span>fn<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+
+  <span class="token keyword">virtual</span> <span class="token keyword">void</span> <span class="token function">shutdown</span><span class="token punctuation">(</span><span class="token punctuation">)</span> override <span class="token punctuation">{</span>
+    pool_<span class="token punctuation">.</span><span class="token function">shutdown_gracefully</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+
+<span class="token keyword">private</span><span class="token operator">:</span>
+  YourThreadPool pool_<span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
+
+svr<span class="token punctuation">.</span>new_task_queue <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span> <span class="token punctuation">{</span>
+  <span class="token keyword">return</span> <span class="token keyword">new</span> <span class="token function">YourThreadPoolTaskQueue</span><span class="token punctuation">(</span><span class="token number">12</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
+</code></pre>
+<h2 id="client-example">Client Example</h2>
+<pre class="language-text"><code>#include &lt;httplib.h&gt;
+#include &lt;iostream&gt;
+
+int main(void)
+{
+  // IMPORTANT: 1st parameter must be a hostname or an IP address string.
+  httplib::Client cli(&quot;localhost&quot;, 1234);
+
+  auto res = cli.Get(&quot;/hi&quot;);
+  if (res &amp;&amp; res-&gt;status == 200) {
+    std::cout &lt;&lt; res-&gt;body &lt;&lt; std::endl;
+  }
+}
+</code></pre>
+<h3 id="get-with-http-headers">GET with HTTP headers</h3>
+<pre class="language-text"><code>httplib::Headers headers = {
+  { &quot;Accept-Encoding&quot;, &quot;gzip, deflate&quot; }
+};
+auto res = cli.Get(&quot;/hi&quot;, headers);
+</code></pre>
+<h3 id="get-with-content-receiver">GET with Content Receiver</h3>
+<pre class="language-text"><code>std::string body;
+
+auto res = cli.Get(&quot;/large-data&quot;,
+  [&amp;](const char *data, size_t data_length) {
+    body.append(data, data_length);
+    return true;
+  });
+
+assert(res-&gt;body.empty());
+</code></pre>
+<h3 id="post">POST</h3>
+<pre class="language-text"><code>res = cli.Post(&quot;/post&quot;, &quot;text&quot;, &quot;text/plain&quot;);
+res = cli.Post(&quot;/person&quot;, &quot;name=john1&amp;note=coder&quot;, &quot;application/x-www-form-urlencoded&quot;);
+</code></pre>
+<h3 id="post-with-parameters">POST with parameters</h3>
+<pre class="language-text"><code>httplib::Params params;
+params.emplace(&quot;name&quot;, &quot;john&quot;);
+params.emplace(&quot;note&quot;, &quot;coder&quot;);
+
+auto res = cli.Post(&quot;/post&quot;, params);
+</code></pre>
+<p>or</p>
+<pre class="language-text"><code>httplib::Params params{
+  { &quot;name&quot;, &quot;john&quot; },
+  { &quot;note&quot;, &quot;coder&quot; }
+};
+
+auto res = cli.Post(&quot;/post&quot;, params);
+</code></pre>
+<h3 id="post-with-multipart-form-data">POST with Multipart Form Data</h3>
+<pre class="language-text"><code>httplib::MultipartFormDataItems items = {
+  { &quot;text1&quot;, &quot;text default&quot;, &quot;&quot;, &quot;&quot; },
+  { &quot;text2&quot;, &quot;a&#x3C9;b&quot;, &quot;&quot;, &quot;&quot; },
+  { &quot;file1&quot;, &quot;h\ne\n\nl\nl\no\n&quot;, &quot;hello.txt&quot;, &quot;text/plain&quot; },
+  { &quot;file2&quot;, &quot;{\n  \&quot;world\&quot;, true\n}\n&quot;, &quot;world.json&quot;, &quot;application/json&quot; },
+  { &quot;file3&quot;, &quot;&quot;, &quot;&quot;, &quot;application/octet-stream&quot; },
+};
+
+auto res = cli.Post(&quot;/multipart&quot;, items);
+</code></pre>
+<h3 id="put">PUT</h3>
+<pre class="language-text"><code>res = cli.Put(&quot;/resource/foo&quot;, &quot;text&quot;, &quot;text/plain&quot;);
+</code></pre>
+<h3 id="delete">DELETE</h3>
+<pre class="language-text"><code>res = cli.Delete(&quot;/resource/foo&quot;);
+</code></pre>
+<h3 id="options">OPTIONS</h3>
+<pre class="language-text"><code>res = cli.Options(&quot;*&quot;);
+res = cli.Options(&quot;/resource/foo&quot;);
+</code></pre>
+<h3 id="timeout-1">Timeout</h3>
+<pre class="language-text"><code>cli.set_connection_timeout(0, 300000); // 300 milliseconds
+cli.set_read_timeout(5, 0); // 5 seconds
+cli.set_write_timeout(5, 0); // 5 seconds
+</code></pre>
+<h3 id="receive-content-with-content-receiver-1">Receive content with Content receiver</h3>
+<pre class="language-cpp"><code>std<span class="token operator">::</span>string body<span class="token punctuation">;</span>
+<span class="token keyword">auto</span> res <span class="token operator">=</span> cli<span class="token punctuation">.</span><span class="token function">Get</span><span class="token punctuation">(</span>
+  <span class="token string">&quot;/stream&quot;</span><span class="token punctuation">,</span> <span class="token function">Headers</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+  <span class="token punctuation">[</span><span class="token operator">&amp;</span><span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token keyword">const</span> Response <span class="token operator">&amp;</span>response<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">EXPECT_EQ</span><span class="token punctuation">(</span><span class="token number">200</span><span class="token punctuation">,</span> response<span class="token punctuation">.</span>status<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> <span class="token boolean">true</span><span class="token punctuation">;</span> <span class="token comment">// return &apos;false&apos; if you want to cancel the request.</span>
+  <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  <span class="token punctuation">[</span><span class="token operator">&amp;</span><span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token keyword">const</span> <span class="token keyword">char</span> <span class="token operator">*</span>data<span class="token punctuation">,</span> size_t data_length<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    body<span class="token punctuation">.</span><span class="token function">append</span><span class="token punctuation">(</span>data<span class="token punctuation">,</span> data_length<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> <span class="token boolean">true</span><span class="token punctuation">;</span> <span class="token comment">// return &apos;false&apos; if you want to cancel the request.</span>
+  <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<h3 id="send-content-with-content-provider-1">Send content with Content provider</h3>
+<pre class="language-cpp"><code>std<span class="token operator">::</span>string body <span class="token operator">=</span> <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">;</span>
+<span class="token keyword">auto</span> res <span class="token operator">=</span> cli_<span class="token punctuation">.</span><span class="token function">Post</span><span class="token punctuation">(</span>
+  <span class="token string">&quot;/stream&quot;</span><span class="token punctuation">,</span> body<span class="token punctuation">.</span><span class="token function">size</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+  <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">(</span>size_t offset<span class="token punctuation">,</span> size_t length<span class="token punctuation">,</span> DataSink <span class="token operator">&amp;</span>sink<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    sink<span class="token punctuation">.</span><span class="token function">write</span><span class="token punctuation">(</span>body<span class="token punctuation">.</span><span class="token function">data</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">+</span> offset<span class="token punctuation">,</span> length<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> <span class="token boolean">true</span><span class="token punctuation">;</span> <span class="token comment">// return &apos;false&apos; if you want to cancel the request.</span>
+  <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  <span class="token string">&quot;text/plain&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<h3 id="with-progress-callback">With Progress Callback</h3>
+<pre class="language-cpp"><code>httplib<span class="token operator">::</span>Client <span class="token function">client</span><span class="token punctuation">(</span>url<span class="token punctuation">,</span> port<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// prints: 0 / 000 bytes =&gt; 50% complete</span>
+std<span class="token operator">::</span>shared_ptr<span class="token operator">&lt;</span>httplib<span class="token operator">::</span>Response<span class="token operator">&gt;</span> res <span class="token operator">=</span>
+  cli<span class="token punctuation">.</span><span class="token function">Get</span><span class="token punctuation">(</span><span class="token string">&quot;/&quot;</span><span class="token punctuation">,</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token keyword">uint64_t</span> len<span class="token punctuation">,</span> <span class="token keyword">uint64_t</span> total<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">&quot;%lld / %lld bytes =&gt; %d%% complete\n&quot;</span><span class="token punctuation">,</span>
+      len<span class="token punctuation">,</span> total<span class="token punctuation">,</span>
+      <span class="token punctuation">(</span><span class="token keyword">int</span><span class="token punctuation">)</span><span class="token punctuation">(</span>len<span class="token operator">*</span><span class="token number">100</span><span class="token operator">/</span>total<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> <span class="token boolean">true</span><span class="token punctuation">;</span> <span class="token comment">// return &apos;false&apos; if you want to cancel the request.</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p><img src="https://user-images.githubusercontent.com/236374/33138910-495c4ecc-cf86-11e7-8693-2fc6d09615c4.gif" alt="progress"></p>
+<h3 id="authentication">Authentication</h3>
+<pre class="language-cpp"><code><span class="token comment">// Basic Authentication</span>
+cli<span class="token punctuation">.</span><span class="token function">set_basic_auth</span><span class="token punctuation">(</span><span class="token string">&quot;user&quot;</span><span class="token punctuation">,</span> <span class="token string">&quot;pass&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// Digest Authentication</span>
+cli<span class="token punctuation">.</span><span class="token function">set_digest_auth</span><span class="token punctuation">(</span><span class="token string">&quot;user&quot;</span><span class="token punctuation">,</span> <span class="token string">&quot;pass&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p>NOTE: OpenSSL is required for Digest Authentication.</p>
+<h3 id="proxy-server-support">Proxy server support</h3>
+<pre class="language-cpp"><code>cli<span class="token punctuation">.</span><span class="token function">set_proxy</span><span class="token punctuation">(</span><span class="token string">&quot;host&quot;</span><span class="token punctuation">,</span> port<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// Basic Authentication</span>
+cli<span class="token punctuation">.</span><span class="token function">set_proxy_basic_auth</span><span class="token punctuation">(</span><span class="token string">&quot;user&quot;</span><span class="token punctuation">,</span> <span class="token string">&quot;pass&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// Digest Authentication</span>
+cli<span class="token punctuation">.</span><span class="token function">set_proxy_digest_auth</span><span class="token punctuation">(</span><span class="token string">&quot;user&quot;</span><span class="token punctuation">,</span> <span class="token string">&quot;pass&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p>NOTE: OpenSSL is required for Digest Authentication.</p>
+<h3 id="range">Range</h3>
+<pre class="language-cpp"><code>httplib<span class="token operator">::</span>Client <span class="token function">cli</span><span class="token punctuation">(</span><span class="token string">&quot;httpbin.org&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">auto</span> res <span class="token operator">=</span> cli<span class="token punctuation">.</span><span class="token function">Get</span><span class="token punctuation">(</span><span class="token string">&quot;/range/32&quot;</span><span class="token punctuation">,</span> <span class="token punctuation">{</span>
+  httplib<span class="token operator">::</span><span class="token function">make_range_header</span><span class="token punctuation">(</span><span class="token punctuation">{</span><span class="token punctuation">{</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">10</span><span class="token punctuation">}</span><span class="token punctuation">}</span><span class="token punctuation">)</span> <span class="token comment">// &apos;Range: bytes=1-10&apos;</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment">// res-&gt;status should be 206.</span>
+<span class="token comment">// res-&gt;body should be &quot;bcdefghijk&quot;.</span>
+</code></pre>
+<pre class="language-cpp"><code>httplib<span class="token operator">::</span><span class="token function">make_range_header</span><span class="token punctuation">(</span><span class="token punctuation">{</span><span class="token punctuation">{</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">10</span><span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token punctuation">{</span><span class="token number">20</span><span class="token punctuation">,</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">}</span><span class="token punctuation">}</span><span class="token punctuation">)</span>      <span class="token comment">// &apos;Range: bytes=1-10, 20-&apos;</span>
+httplib<span class="token operator">::</span><span class="token function">make_range_header</span><span class="token punctuation">(</span><span class="token punctuation">{</span><span class="token punctuation">{</span><span class="token number">100</span><span class="token punctuation">,</span> <span class="token number">199</span><span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token punctuation">{</span><span class="token number">500</span><span class="token punctuation">,</span> <span class="token number">599</span><span class="token punctuation">}</span><span class="token punctuation">}</span><span class="token punctuation">)</span> <span class="token comment">// &apos;Range: bytes=100-199, 500-599&apos;</span>
+httplib<span class="token operator">::</span><span class="token function">make_range_header</span><span class="token punctuation">(</span><span class="token punctuation">{</span><span class="token punctuation">{</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token punctuation">{</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">}</span><span class="token punctuation">}</span><span class="token punctuation">)</span>        <span class="token comment">// &apos;Range: bytes=0-0, -1&apos;</span>
+</code></pre>
+<h3 id="keep-alive-connection-1">Keep-Alive connection</h3>
+<pre class="language-cpp"><code>httplib<span class="token operator">::</span>Client <span class="token function">cli</span><span class="token punctuation">(</span><span class="token string">&quot;localhost&quot;</span><span class="token punctuation">,</span> <span class="token number">1234</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+cli<span class="token punctuation">.</span><span class="token function">Get</span><span class="token punctuation">(</span><span class="token string">&quot;/hello&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>         <span class="token comment">// with &quot;Connection: close&quot;</span>
+
+cli<span class="token punctuation">.</span><span class="token function">set_keep_alive</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+cli<span class="token punctuation">.</span><span class="token function">Get</span><span class="token punctuation">(</span><span class="token string">&quot;/world&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+cli<span class="token punctuation">.</span><span class="token function">set_keep_alive</span><span class="token punctuation">(</span><span class="token boolean">false</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+cli<span class="token punctuation">.</span><span class="token function">Get</span><span class="token punctuation">(</span><span class="token string">&quot;/last-request&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>  <span class="token comment">// with &quot;Connection: close&quot;</span>
+</code></pre>
+<h3 id="redirect">Redirect</h3>
+<pre class="language-cpp"><code>httplib<span class="token operator">::</span>Client <span class="token function">cli</span><span class="token punctuation">(</span><span class="token string">&quot;yahoo.com&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">auto</span> res <span class="token operator">=</span> cli<span class="token punctuation">.</span><span class="token function">Get</span><span class="token punctuation">(</span><span class="token string">&quot;/&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+res<span class="token operator">-&gt;</span>status<span class="token punctuation">;</span> <span class="token comment">// 301</span>
+
+cli<span class="token punctuation">.</span><span class="token function">set_follow_location</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+res <span class="token operator">=</span> cli<span class="token punctuation">.</span><span class="token function">Get</span><span class="token punctuation">(</span><span class="token string">&quot;/&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+res<span class="token operator">-&gt;</span>status<span class="token punctuation">;</span> <span class="token comment">// 200</span>
+</code></pre>
+<h3 id="use-a-specitic-network-interface">Use a specitic network interface</h3>
+<p>NOTE: This feature is not available on Windows, yet.</p>
+<pre class="language-cpp"><code>cli<span class="token punctuation">.</span><span class="token function">set_interface</span><span class="token punctuation">(</span><span class="token string">&quot;eth0&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// Interface name, IP address or host name</span>
+</code></pre>
+<h2 id="openssl-support">OpenSSL Support</h2>
+<p>SSL support is available with <code>CPPHTTPLIB_OPENSSL_SUPPORT</code>. <code>libssl</code> and <code>libcrypto</code> should be linked.</p>
+<p>NOTE: cpp-httplib supports 1.1.1 (until 2023-09-11) and 1.0.2 (2019-12-31).</p>
+<pre class="language-text"><code>#define CPPHTTPLIB_OPENSSL_SUPPORT
+
+SSLServer svr(&quot;./cert.pem&quot;, &quot;./key.pem&quot;);
+
+SSLClient cli(&quot;localhost&quot;, 8080);
+cli.set_ca_cert_path(&quot;./ca-bundle.crt&quot;);
+cli.enable_server_certificate_verification(true);
+</code></pre>
+<h2 id="zlib-support">Zlib Support</h2>
+<p>&apos;gzip&apos; compression is available with <code>CPPHTTPLIB_ZLIB_SUPPORT</code>. <code>libz</code> should be linked.</p>
+<p>The server applies gzip compression to the following MIME type contents:</p>
+<ul>
+<li>all text types</li>
+<li>image/svg+xml</li>
+<li>application/javascript</li>
+<li>application/json</li>
+<li>application/xml</li>
+<li>application/xhtml+xml</li>
+</ul>
+<h3 id="compress-request-body-on-client">Compress request body on client</h3>
+<pre class="language-text"><code>cli.set_compress(true);
+res = cli.Post(&quot;/resource/foo&quot;, &quot;...&quot;, &quot;text/plain&quot;);
+</code></pre>
+<h3 id="compress-response-body-on-client">Compress response body on client</h3>
+<pre class="language-text"><code>cli.set_decompress(false);
+res = cli.Get(&quot;/resource/foo&quot;, {{&quot;Accept-Encoding&quot;, &quot;gzip, deflate&quot;}});
+res-&gt;body; // Compressed data
+</code></pre>
+<h2 id="split-httplib.h-into-.h-and-.cc">Split httplib.h into .h and .cc</h2>
+<pre class="language-bash"><code><span class="token operator">&gt;</span> python3 split.py
+<span class="token operator">&gt;</span> <span class="token function">ls</span> out
+httplib.h  httplib.cc
+</code></pre>
+<h2 id="note">NOTE</h2>
+<h3 id="g%2B%2B">g++</h3>
+<p>g++ 4.8 and below cannot build this library since <code>&lt;regex&gt;</code> in the versions are <a href="https://stackoverflow.com/questions/12530406/is-gcc-4-8-or-earlier-buggy-about-regular-expressions" target="_blank" rel="noopener">broken</a>.</p>
+<h3 id="windows">Windows</h3>
+<p>Include <code>httplib.h</code> before <code>Windows.h</code> or include <code>Windows.h</code> by defining <code>WIN32_LEAN_AND_MEAN</code> beforehand.</p>
+<pre class="language-cpp"><code><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;httplib.h&gt;</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;Windows.h&gt;</span></span>
+</code></pre>
+<pre class="language-cpp"><code><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token expression">WIN32_LEAN_AND_MEAN</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;Windows.h&gt;</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;httplib.h&gt;</span></span>
+</code></pre>
+<p>Note: Cygwin on Windows is not supported.</p>
+<h2 id="license">License</h2>
+<p>MIT license (&#xA9; 2020 Yuji Hirose)</p>
+<h2 id="special-thanks-to">Special Thanks To</h2>
+<p><a href="https://github.com/yhirose/cpp-httplib/graphs/contributors" target="_blank" rel="noopener">These folks</a> made great contributions to polish this library to totally another level from a simple toy!</p>
+</body></html></div>
+        </main>
+      </div>
+    </div>
+<footer class="app-footer text-md-left text-center">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-md-2 mb-md-0 mb-4">
+        <span class="pr-md-5 pr-0 py-3">
+          <a href="https://runtimeverification.com" target="_blank">
+            <picture>
+              <source
+                srcset="../../../../assets/img/rv-logo-dark.png"
+                media="(prefers-color-scheme: dark)"
+              />
+              <img
+                class="pr-3 footer-logo"
+                src="../../../../assets/img/rv-logo.png"
+                alt="Runtime Verification Inc logo"
+              />
+            </picture>
+          </a>
+        </span>
+      </div>
+      <div class="col-md-6 mb-md-0 mb-4"></div>
+      <div class="col-md-4 text-md-right">
+        <p class="copyright">
+          &copy; 2020 Runtime Verification Inc. All right reserved.
+        </p>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script
+  async
+  src="https://www.googletagmanager.com/gtag/js?id=UA-163311512-1"
+></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag() {
+    dataLayer.push(arguments);
+  }
+  gtag("js", new Date());
+  gtag("config", "UA-163311512-1");
+</script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Typist/1.2/typist.min.js"></script>
+    <script src="../../../../assets/js/index.js"></script>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=G-QL0D8HRYFW"
+    ></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+      gtag("config", "G-QL0D8HRYFW");
+    </script>
+  </body>
+</html>
